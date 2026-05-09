@@ -6,21 +6,21 @@ WORKDIR /app
 # Copiar archivos de dependencias
 COPY package*.json ./
 
-# Instalar dependencias
+# Instalar TODAS las dependencias (incluyendo devDependencies para ts-node)
 RUN npm install
 
-# Copiar el esquema de Prisma y generar el cliente
+# Copiar el esquema de Prisma
 COPY prisma ./prisma
+
+# Generar el cliente de Prisma para Linux (dentro del contenedor)
 RUN npx prisma generate
 
-# Copiar el resto del código fuente
-COPY . .
-
-# Compilar TypeScript a JavaScript
-RUN npm run build
+# Copiar el resto del código fuente (sin el cliente generado en Windows)
+COPY src ./src
+COPY tsconfig.json ./
 
 # Exponer el puerto
 EXPOSE 3000
 
-# Comando para iniciar la aplicación
-CMD ["npm", "start"]
+# Iniciar directamente con ts-node (sin compilar)
+CMD ["npx", "ts-node", "src/index.ts"]
