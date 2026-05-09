@@ -1,4 +1,4 @@
-FROM node:18-alpine
+FROM node:18
 
 # Directorio de trabajo
 WORKDIR /app
@@ -12,15 +12,16 @@ RUN npm install
 # Copiar el esquema de Prisma
 COPY prisma ./prisma
 
-# Generar el cliente de Prisma para Linux (dentro del contenedor)
-RUN npx prisma generate
-
-# Copiar el resto del código fuente (sin el cliente generado en Windows)
+# Copiar el código fuente (incluyendo el cliente generado en Windows, se sobreescribirá)
 COPY src ./src
 COPY tsconfig.json ./
+
+# Generar el cliente de Prisma para Linux (sobreescribe el de Windows)
+RUN npx prisma generate
 
 # Exponer el puerto
 EXPOSE 3000
 
-# Iniciar directamente con ts-node (sin compilar)
+# Iniciar con ts-node
 CMD ["npx", "ts-node", "src/index.ts"]
+
