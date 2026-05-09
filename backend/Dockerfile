@@ -22,6 +22,6 @@ RUN npx prisma generate
 # Exponer el puerto
 EXPOSE 3000
 
-# Iniciar con ts-node
-CMD ["npx", "ts-node", "src/index.ts"]
+# Iniciar: crear tablas automáticamente y luego arrancar el servidor
+CMD ["sh", "-c", "npx prisma db push && npx ts-node src/index.ts"]
 
