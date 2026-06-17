@@ -1,6 +1,6 @@
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
@@ -47,6 +47,7 @@ model Warehouse {
   balances  InventoryBalance[]
   docs_from InventoryDocument[] @relation("FromWarehouse")
   docs_to   InventoryDocument[] @relation("ToWarehouse")
+  sellers   Seller[]
 }
 
 model InventoryBalance {
@@ -73,6 +74,7 @@ model InventoryDocument {
   warehouse_from_id Int?
   warehouse_to_id   Int?
   third_party_id    Int?
+  seller_id         Int?
   date              DateTime
   notes             String?
   created_by        Int
@@ -81,6 +83,7 @@ model InventoryDocument {
 
   warehouse_from Warehouse? @relation("FromWarehouse", fields: [warehouse_from_id], references: [id])
   warehouse_to   Warehouse? @relation("ToWarehouse", fields: [warehouse_to_id], references: [id])
+  seller         Seller?    @relation(fields: [seller_id], references: [id])
 
   lines InventoryDocumentLine[]
 }
@@ -129,4 +132,16 @@ model AuditLog {
   user_id   Int
   timestamp DateTime @default(now())
   ip        String?
+}
+
+model Seller {
+  id           Int      @id @default(autoincrement())
+  name         String
+  code         String   @unique
+  warehouse_id Int
+  active       Boolean  @default(true)
+  created_at   DateTime @default(now())
+
+  warehouse Warehouse           @relation(fields: [warehouse_id], references: [id])
+  documents InventoryDocument[]
 }

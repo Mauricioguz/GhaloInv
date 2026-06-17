@@ -2,16 +2,22 @@ import React, { useState, useEffect, useMemo } from 'react';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
-const Sidebar = ({ activeTab, setActiveTab }: { activeTab: string, setActiveTab: (t: string) => void }) => (
+const Sidebar = ({ activeTab, setActiveTab, onResetClick }: { activeTab: string, setActiveTab: (t: string) => void, onResetClick: () => void }) => (
   <aside className="sidebar">
     <div className="logo"><span style={{ fontSize: '1.8rem' }}>☕</span> GHALOCAFE</div>
-    <nav className="nav-links">
+    <nav className="nav-links" style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.8rem', marginTop: '1.5rem' }}>
       <a href="#" className={`nav-item ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => setActiveTab('dashboard')}>📊 Dashboard</a>
       <a href="#" className={`nav-item ${activeTab === 'products' ? 'active' : ''}`} onClick={() => setActiveTab('products')}>📦 Productos</a>
       <a href="#" className={`nav-item ${activeTab === 'warehouses' ? 'active' : ''}`} onClick={() => setActiveTab('warehouses')}>🏠 Bodegas</a>
+      <a href="#" className={`nav-item ${activeTab === 'sellers' ? 'active' : ''}`} onClick={() => setActiveTab('sellers')}>👤 Vendedores</a>
       <a href="#" className={`nav-item ${activeTab === 'transactions' ? 'active' : ''}`} onClick={() => setActiveTab('transactions')}>🔄 Transacciones</a>
       <a href="#" className={`nav-item ${activeTab === 'reports' ? 'active' : ''}`} onClick={() => setActiveTab('reports')}>📑 Reportes</a>
     </nav>
+    <div className="sidebar-footer" style={{ marginTop: 'auto', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+      <button className="btn btn-outline" style={{ width: '100%', borderColor: 'var(--danger)', color: 'var(--danger)', padding: '8px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }} onClick={onResetClick}>
+        ⚠️ Reiniciar Datos
+      </button>
+    </div>
   </aside>
 );
 
@@ -382,12 +388,13 @@ const WarehouseManager = ({ warehouses, onRefresh }: any) => {
     );
 };
 
-const TransactionEngine = ({ products, warehouses, onRefresh }: any) => {
+const TransactionEngine = ({ products, warehouses, sellers = [], onRefresh }: any) => {
     const [docType, setDocType] = useState('IN');
     const [formData, setFormData] = useState({ 
         document_number: '', 
         warehouse_from_id: null as number | null, 
         warehouse_to_id: null as number | null, 
+        seller_id: null as number | null,
         lines: [{ product_id: 0, qty: 0, unit_cost: 0, unit_sale: 0, lot: '' }] 
     });
     const [attachment, setAttachment] = useState<File | null>(null);
@@ -457,7 +464,7 @@ const TransactionEngine = ({ products, warehouses, onRefresh }: any) => {
             if (!res.ok) { const er = await res.json(); throw new Error(er.error); }
             alert(correctingDocId ? "✅ Registro corregido con éxito (anterior anulado)." : "✅ Movimiento procesado con éxito."); 
             
-            setFormData({ document_number:'', warehouse_from_id:null, warehouse_to_id:null, lines:[{ product_id:0, qty:0, unit_cost:0, unit_sale: 0, lot: '' }] }); 
+            setFormData({ document_number:'', warehouse_from_id:null, warehouse_to_id:null, seller_id:null, lines:[{ product_id:0, qty:0, unit_cost:0, unit_sale: 0, lot: '' }] }); 
             setAttachment(null);
             setCorrectingDocId(null);
             await onRefresh();
@@ -483,6 +490,7 @@ const TransactionEngine = ({ products, warehouses, onRefresh }: any) => {
             document_number: doc.document_number + " (CORRIGIERDO)",
             warehouse_from_id: doc.warehouse_from_id,
             warehouse_to_id: doc.warehouse_to_id,
+            seller_id: doc.seller_id,
             lines: doc.lines.map((l: any) => ({
                 product_id: l.product_id,
                 qty: l.qty,
@@ -550,23 +558,25 @@ const TransactionEngine = ({ products, warehouses, onRefresh }: any) => {
             </div>
             
             <form onSubmit={handleSubmit}>
-                <div className="glass-card" style={{display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:'1.5rem', marginBottom:'1.5rem'}}>
+                <div className="glass-card" style={{display:'grid', gridTemplateColumns: docType === 'OUT' ? 'repeat(4, 1fr)' : 'repeat(3, 1fr)', gap:'1.5rem', marginBottom:'1.5rem'}}>
                     <div style={{position:'relative'}}>
                         <input className="glass-card" placeholder="N° Documento" value={formData.document_number} onChange={e=>setFormData({...formData, document_number:e.target.value})} required readOnly={loadingNum} style={{backgroundColor: loadingNum ? 'rgba(255,255,255,0.05)' : ''}} />
                         {loadingNum && <small style={{position:'absolute', bottom:'-15px', left:0, fontSize:'9px', color:'var(--primary)'}}>Generando...</small>}
                     </div>
 
-                    {docType==='OUT' && (
-                        <div>
-                            <label style={{fontSize:'0.7rem', display:'block', marginBottom:'2px'}}>Cerrar con Comprobante (Opcional):</label>
-                            <input type="file" className="glass-card" onChange={e => setAttachment(e.target.files?.[0] || null)} style={{padding:'5px', fontSize:'0.75rem'}} />
-                        </div>
-                    )}
-                    
                     {docType!=='IN' && (
-                        <select className="glass-card" value={formData.warehouse_from_id||''} onChange={e=>setFormData({...formData, warehouse_from_id:parseInt(e.target.value), lines:[{product_id:0,qty:0,unit_cost:0, lot: ''}]})} required>
+                        <select className="glass-card" value={formData.warehouse_from_id||''} onChange={e=>setFormData({...formData, warehouse_from_id:parseInt(e.target.value), seller_id: null, lines:[{product_id:0,qty:0,unit_cost:0, lot: ''}]})} required>
                             <option value="">Bodega Origen (Con Existencias)</option>
                             {activeWFrom.map((w:any)=><option key={w.id} value={w.id}>{w.name}</option>)}
+                        </select>
+                    )}
+
+                    {docType==='OUT' && (
+                        <select className="glass-card" value={formData.seller_id||''} onChange={e=>setFormData({...formData, seller_id:parseInt(e.target.value)})} required>
+                            <option value="">Vendedor...</option>
+                            {sellers.filter((s:any) => s.active && Number(s.warehouse_id) === Number(formData.warehouse_from_id)).map((s:any)=>(
+                                <option key={s.id} value={s.id}>{s.name} [{s.code}]</option>
+                            ))}
                         </select>
                     )}
                     
@@ -575,6 +585,12 @@ const TransactionEngine = ({ products, warehouses, onRefresh }: any) => {
                             <option value="">Bodega Destino</option>
                             {warehouses.filter((w:any)=>w.active).map((w:any)=><option key={w.id} value={w.id}>{w.name}</option>)}
                         </select>
+                    )}
+
+                    {docType==='OUT' && (
+                        <div>
+                            <input type="file" className="glass-card" onChange={e => setAttachment(e.target.files?.[0] || null)} style={{padding:'7px 10px', fontSize:'0.75rem', width: '100%', boxSizing: 'border-box'}} />
+                        </div>
                     )}
                 </div>
 
@@ -643,7 +659,7 @@ const TransactionEngine = ({ products, warehouses, onRefresh }: any) => {
                 {correctingDocId && (
                     <button type="button" className="btn btn-outline" style={{width:'100%', marginTop:'0.5rem'}} onClick={() => {
                         setCorrectingDocId(null);
-                        setFormData({ document_number:'', warehouse_from_id:null, warehouse_to_id:null, lines:[{ product_id:0, qty:0, unit_cost:0, lot: '' }] });
+                        setFormData({ document_number:'', warehouse_from_id:null, warehouse_to_id:null, seller_id:null, lines:[{ product_id:0, qty:0, unit_cost:0, lot: '' }] });
                         fetchNextNumber(docType);
                     }}>CANCELAR EDICIÓN</button>
                 )}
@@ -764,7 +780,7 @@ const ProductDetailModal = ({ productId, onClose }: any) => {
     );
 };
 
-const SalesReport = ({ onProductClick }: any) => {
+const SalesReport = ({ sellers = [], onProductClick }: any) => {
     const [data, setData] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('');
@@ -794,7 +810,9 @@ const SalesReport = ({ onProductClick }: any) => {
                     product_sku: line.product?.sku,
                     qty: line.qty,
                     unit_cost: line.unit_cost,
-                    total_cost: line.total_cost
+                    total_cost: line.total_cost,
+                    unit_sale: line.unit_sale || 0,
+                    total_sale: line.total_sale || 0
                 });
             });
         });
@@ -808,9 +826,58 @@ const SalesReport = ({ onProductClick }: any) => {
     const totals = useMemo(() => {
         return flattenedLines.reduce((acc, curr) => ({
             qty: acc.qty + curr.qty,
-            value: acc.value + (curr.total_cost || 0)
-        }), { qty: 0, value: 0 });
+            value: acc.value + (curr.total_cost || 0),
+            salesValue: acc.salesValue + (curr.total_sale || 0)
+        }), { qty: 0, value: 0, salesValue: 0 });
     }, [flattenedLines]);
+
+    const sellerStats = useMemo(() => {
+        const statsMap: { [key: string]: { id: number, name: string, code: string, warehouse: string, sale: number, cost: number } } = {};
+
+        data.forEach(doc => {
+            if (doc.seller) {
+                const sId = doc.seller.id;
+                if (!statsMap[sId]) {
+                    statsMap[sId] = {
+                        id: sId,
+                        name: doc.seller.name,
+                        code: doc.seller.code,
+                        warehouse: doc.warehouse_from?.name || 'N/A',
+                        sale: 0,
+                        cost: 0
+                    };
+                }
+                doc.lines.forEach((line: any) => {
+                    statsMap[sId].sale += line.total_sale || 0;
+                    statsMap[sId].cost += line.total_cost || 0;
+                });
+            } else {
+                const sId = 'unassigned';
+                if (!statsMap[sId]) {
+                    statsMap[sId] = {
+                        id: 0,
+                        name: 'Sin Vendedor Asignado',
+                        code: 'N/A',
+                        warehouse: 'N/A',
+                        sale: 0,
+                        cost: 0
+                    };
+                }
+                doc.lines.forEach((line: any) => {
+                    statsMap[sId].sale += line.total_sale || 0;
+                    statsMap[sId].cost += line.total_cost || 0;
+                });
+            }
+        });
+
+        return Object.values(statsMap)
+            .map(s => {
+                const utility = s.sale - s.cost;
+                const margin = s.sale > 0 ? (utility / s.sale) * 100 : 0;
+                return { ...s, utility, margin };
+            })
+            .sort((a, b) => b.utility - a.utility);
+    }, [data]);
 
     return (
         <div className="view">
@@ -819,6 +886,62 @@ const SalesReport = ({ onProductClick }: any) => {
                 <button className="btn btn-outline" onClick={fetchReport}>🔄 Actualizar</button>
             </div>
 
+            {/* Ranking de Vendedores Table */}
+            <div className="glass-card" style={{ marginBottom: '2rem' }}>
+                <h3 style={{ color: 'var(--primary)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>🏆 Ranking de Vendedores (Ventas vs Costos)</h3>
+                <div style={{ padding: 0, overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                        <thead>
+                            <tr>
+                                <th style={{ width: '50px', textAlign: 'center' }}>Rank</th>
+                                <th>Vendedor</th>
+                                <th>Bodega</th>
+                                <th style={{ textAlign: 'right' }}>Vendido (Precio)</th>
+                                <th style={{ textAlign: 'right' }}>Costo Inventario</th>
+                                <th style={{ textAlign: 'right' }}>Diferencia (Utilidad)</th>
+                                <th style={{ textAlign: 'center', width: '100px' }}>Margen</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {sellerStats.map((stat, idx) => {
+                                const isUnassigned = stat.id === 0;
+                                return (
+                                    <tr key={stat.id || 'unassigned'} style={{ background: idx === 0 && stat.utility > 0 && !isUnassigned ? 'rgba(16, 185, 129, 0.04)' : 'transparent' }}>
+                                        <td style={{ textAlign: 'center', fontWeight: 'bold', color: idx === 0 && !isUnassigned ? 'var(--warning)' : 'inherit' }}>
+                                            {isUnassigned ? '-' : `#${idx + 1}`}
+                                        </td>
+                                        <td style={{ fontWeight: 600 }}>
+                                            {stat.name} {!isUnassigned && <span style={{ fontSize: '0.75rem', opacity: 0.6, fontWeight: 'normal' }}>({stat.code})</span>}
+                                        </td>
+                                        <td>{stat.warehouse}</td>
+                                        <td style={{ textAlign: 'right', fontWeight: 600, color: 'var(--success)' }}>
+                                            {new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(stat.sale)}
+                                        </td>
+                                        <td style={{ textAlign: 'right', opacity: 0.85 }}>
+                                            {new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(stat.cost)}
+                                        </td>
+                                        <td style={{ textAlign: 'right', fontWeight: 700, color: stat.utility >= 0 ? 'var(--success)' : 'var(--danger)' }}>
+                                            {new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(stat.utility)}
+                                        </td>
+                                        <td style={{ textAlign: 'center' }}>
+                                            <span className={`badge ${stat.utility >= 0 ? 'badge-in' : 'badge-out'}`} style={{ fontWeight: 'bold' }}>
+                                                {stat.margin.toFixed(1)}%
+                                            </span>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
+                            {sellerStats.length === 0 && (
+                                <tr>
+                                    <td colSpan={7} style={{ textAlign: 'center', padding: '1.5rem', opacity: 0.5 }}>No hay datos de ventas para mostrar ranking.</td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {/* Detailed outputs */}
             <div className="glass-card" style={{ marginBottom: '1.5rem', display: 'flex', gap: '1rem', alignItems: 'center' }}>
                 <div style={{ flex: 1 }}>
                     <input 
@@ -888,19 +1011,201 @@ const SalesReport = ({ onProductClick }: any) => {
     );
 };
 
+const SellerManager = ({ sellers, warehouses, onRefresh }: any) => {
+    const [showAdd, setShowAdd] = useState(false);
+    const [editingId, setEditingId] = useState<number | null>(null);
+    const [formData, setFormData] = useState({ name: '', code: '', warehouse_id: '' });
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            const url = editingId ? `${API_URL}/sellers/${editingId}` : `${API_URL}/sellers`;
+            const method = editingId ? 'PUT' : 'POST';
+            const res = await fetch(url, { 
+                method, 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({
+                    name: formData.name,
+                    code: formData.code,
+                    warehouse_id: parseInt(formData.warehouse_id)
+                }) 
+            });
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.error || 'Error al guardar vendedor');
+            }
+            setShowAdd(false); 
+            setEditingId(null); 
+            onRefresh();
+        } catch (err: any) { alert(err.message); }
+    };
+
+    const deleteSeller = async (id: number) => {
+        if (!confirm('¿Seguro que desea inactivar este vendedor?')) return;
+        try {
+            await fetch(`${API_URL}/sellers/${id}`, { method: 'DELETE' });
+            onRefresh();
+        } catch (err: any) { alert(err.message); }
+    };
+
+    return (
+        <div className="view">
+            <div className="header">
+                <h1>Vendedores</h1>
+                <button className="btn btn-primary" onClick={() => { 
+                    setShowAdd(true); 
+                    setEditingId(null); 
+                    setFormData({name:'', code:'', warehouse_id:''}); 
+                }}>+ Nuevo Vendedor</button>
+            </div>
+            {showAdd && (
+                <div className="glass-card" style={{marginBottom:'2rem'}}>
+                    <form onSubmit={handleSubmit} style={{display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:'1rem'}}>
+                        <input placeholder="Nombre Completo" value={formData.name} onChange={e => setFormData({...formData, name:e.target.value})} required />
+                        <input placeholder="Código / ID Vendedor" value={formData.code} onChange={e => setFormData({...formData, code:e.target.value})} required />
+                        <select value={formData.warehouse_id} onChange={e => setFormData({...formData, warehouse_id:e.target.value})} required>
+                            <option value="">Asignar Bodega...</option>
+                            {warehouses.filter((w:any)=>w.active).map((w:any)=><option key={w.id} value={w.id}>{w.name}</option>)}
+                        </select>
+                        <div style={{gridColumn:'span 3', display:'flex', gap:'10px', justifyContent:'flex-end'}}>
+                            <button type="button" className="btn btn-outline" onClick={() => setShowAdd(false)}>Cancelar</button>
+                            <button type="submit" className="btn btn-primary">Guardar Vendedor</button>
+                        </div>
+                    </form>
+                </div>
+            )}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Nombre</th>
+                        <th>Bodega Asignada</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {sellers.map((s:any) => (
+                        <tr key={s.id} style={{opacity: s.active ? 1 : 0.6}}>
+                            <td style={{fontWeight:600}}>{s.code}</td>
+                            <td>{s.name}</td>
+                            <td>
+                                <span className="badge" style={{background: s.warehouse?.color ? `${s.warehouse.color}33` : 'rgba(255,255,255,0.05)', color: s.warehouse?.color || 'inherit', border: s.warehouse?.color ? `1px solid ${s.warehouse.color}` : 'none'}}>
+                                    {s.warehouse?.name || 'No asignada'}
+                                </span>
+                            </td>
+                            <td>
+                                <span className={`badge ${s.active ? 'badge-in' : 'badge-out'}`}>
+                                    {s.active ? 'Activo' : 'Inactivo'}
+                                </span>
+                            </td>
+                            <td>
+                                <div style={{display:'flex', gap:'10px'}}>
+                                    <button className="btn btn-outline" style={{padding:'4px 10px', fontSize:'0.75rem'}} onClick={() => { 
+                                        setEditingId(s.id); 
+                                        setFormData({name:s.name, code:s.code, warehouse_id:String(s.warehouse_id)}); 
+                                        setShowAdd(true); 
+                                    }}>Editar</button>
+                                    {s.active && (
+                                        <button className="btn btn-outline" style={{padding:'4px 10px', fontSize:'0.75rem', color:'#e06c75', borderColor:'#e06c75'}} onClick={() => deleteSeller(s.id)}>Inactivar</button>
+                                    )}
+                                </div>
+                            </td>
+                        </tr>
+                    ))}
+                    {sellers.length === 0 && (
+                        <tr>
+                            <td colSpan={5} style={{textAlign:'center', padding:'2rem', opacity:0.5}}>No hay vendedores registrados.</td>
+                        </tr>
+                    )}
+                </tbody>
+            </table>
+        </div>
+    );
+};
+
+const SystemResetModal = ({ onClose, onResetComplete }: any) => {
+    const [keepCatalog, setKeepCatalog] = useState(true);
+    const [confirmText, setConfirmText] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    const handleReset = async () => {
+        if (confirmText.toUpperCase() !== 'ELIMINAR') {
+            alert('Por favor escribe ELIMINAR para confirmar.');
+            return;
+        }
+        setLoading(true);
+        try {
+            const res = await fetch(`${API_URL}/admin/clear-data`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ keepCatalog })
+            });
+            if (!res.ok) throw new Error('Error al reiniciar los datos.');
+            alert('✅ Sistema reiniciado correctamente.');
+            onResetComplete();
+            onClose();
+        } catch (e: any) {
+            alert(e.message);
+        }
+        setLoading(false);
+    };
+
+    return (
+        <div className="modal-overlay" onClick={onClose}>
+            <div className="modal-content glass-card" onClick={e => e.stopPropagation()} style={{ maxWidth: '500px', width: '90%' }}>
+                <h2 style={{ color: 'var(--danger)', marginBottom: '1rem' }}>⚠️ Reiniciar Datos del Sistema</h2>
+                <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
+                    Esta acción borrará de forma permanente los registros seleccionados. Esta operación no se puede deshacer.
+                </p>
+
+                <div style={{ marginBottom: '1.5rem' }}>
+                    <label style={{ display: 'block', fontWeight: 600, marginBottom: '8px' }}>Tipo de Reinicio:</label>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                            <input type="radio" name="resetType" checked={keepCatalog === true} onChange={() => setKeepCatalog(true)} />
+                            <span><strong>Solo Movimientos de Inventario</strong> (Recomendado)<br /><small style={{ color: 'var(--text-muted)' }}>Mantiene Productos, Bodegas y Vendedores.</small></span>
+                        </label>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                            <input type="radio" name="resetType" checked={keepCatalog === false} onChange={() => setKeepCatalog(false)} />
+                            <span><strong>Reinicio de Fábrica Completo</strong><br /><small style={{ color: 'var(--text-muted)' }}>Borra todo, incluidos Productos, Bodegas y Vendedores.</small></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div style={{ marginBottom: '1.5rem' }}>
+                    <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '6px' }}>Escribe <strong>ELIMINAR</strong> para confirmar:</label>
+                    <input type="text" placeholder="ELIMINAR" value={confirmText} onChange={e => setConfirmText(e.target.value)} style={{ textTransform: 'uppercase', width: '100%' }} />
+                </div>
+
+                <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+                    <button className="btn btn-outline" onClick={onClose} disabled={loading}>Cancelar</button>
+                    <button className="btn btn-primary" style={{ background: 'var(--danger)', borderColor: 'var(--danger)' }} onClick={handleReset} disabled={loading}>
+                        {loading ? 'Reiniciando...' : 'Confirmar Reinicio'}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [products, setProducts] = useState([]);
   const [warehouses, setWarehouses] = useState([]);
+  const [sellers, setSellers] = useState([]);
   const [selId, setSelId] = useState<number | null>(null);
   const [selWhId, setSelWhId] = useState<number | null>(null);
+  const [showResetModal, setShowResetModal] = useState(false);
 
   const fetchData = async () => {
     try {
         const pr = await fetch(`${API_URL}/products`);
         const wr = await fetch(`${API_URL}/warehouses`);
+        const sl = await fetch(`${API_URL}/sellers`);
         setProducts(await pr.json());
         setWarehouses(await wr.json());
+        setSellers(await sl.json());
     } catch (e) { console.error(e); }
   };
 
@@ -908,16 +1213,18 @@ export default function App() {
 
   return (
     <div style={{ display: 'contents' }}>
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} onResetClick={() => setShowResetModal(true)} />
       <main className="main-content">
         {activeTab === 'dashboard' && <Dashboard products={products} warehouses={warehouses} onProductClick={setSelId} onWarehouseClick={setSelWhId} />}
         {activeTab === 'products' && <ProductManager products={products} onRefresh={fetchData} onProductClick={setSelId} />}
-        {activeTab === 'transactions' && <TransactionEngine products={products} warehouses={warehouses} onRefresh={fetchData} />}
+        {activeTab === 'transactions' && <TransactionEngine products={products} warehouses={warehouses} sellers={sellers} onRefresh={fetchData} />}
         {activeTab === 'warehouses' && <WarehouseManager warehouses={warehouses} onRefresh={fetchData} />}
-        {activeTab === 'reports' && <SalesReport onProductClick={setSelId} />}
+        {activeTab === 'sellers' && <SellerManager sellers={sellers} warehouses={warehouses} onRefresh={fetchData} />}
+        {activeTab === 'reports' && <SalesReport sellers={sellers} onProductClick={setSelId} />}
       </main>
       {selId && <ProductDetailModal productId={selId} onClose={() => setSelId(null)} />}
       {selWhId && <WarehouseInventoryModal warehouseId={selWhId} warehouses={warehouses} products={products} onClose={() => setSelWhId(null)} onProductClick={setSelId} />}
+      {showResetModal && <SystemResetModal onClose={() => setShowResetModal(false)} onResetComplete={fetchData} />}
     </div>
   );
 }

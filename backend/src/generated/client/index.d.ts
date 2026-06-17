@@ -53,6 +53,11 @@ export type InventoryLedger = $Result.DefaultSelection<Prisma.$InventoryLedgerPa
  * 
  */
 export type AuditLog = $Result.DefaultSelection<Prisma.$AuditLogPayload>
+/**
+ * Model Seller
+ * 
+ */
+export type Seller = $Result.DefaultSelection<Prisma.$SellerPayload>
 
 /**
  * ##  Prisma Client ʲˢ
@@ -256,6 +261,16 @@ export class PrismaClient<
     * ```
     */
   get auditLog(): Prisma.AuditLogDelegate<ExtArgs>;
+
+  /**
+   * `prisma.seller`: Exposes CRUD operations for the **Seller** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Sellers
+    * const sellers = await prisma.seller.findMany()
+    * ```
+    */
+  get seller(): Prisma.SellerDelegate<ExtArgs>;
 }
 
 export namespace Prisma {
@@ -704,7 +719,8 @@ export namespace Prisma {
     InventoryDocument: 'InventoryDocument',
     InventoryDocumentLine: 'InventoryDocumentLine',
     InventoryLedger: 'InventoryLedger',
-    AuditLog: 'AuditLog'
+    AuditLog: 'AuditLog',
+    Seller: 'Seller'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -720,7 +736,7 @@ export namespace Prisma {
 
   export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> = {
     meta: {
-      modelProps: "user" | "product" | "warehouse" | "inventoryBalance" | "inventoryDocument" | "inventoryDocumentLine" | "inventoryLedger" | "auditLog"
+      modelProps: "user" | "product" | "warehouse" | "inventoryBalance" | "inventoryDocument" | "inventoryDocumentLine" | "inventoryLedger" | "auditLog" | "seller"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1284,6 +1300,76 @@ export namespace Prisma {
           }
         }
       }
+      Seller: {
+        payload: Prisma.$SellerPayload<ExtArgs>
+        fields: Prisma.SellerFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SellerFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SellerFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerPayload>
+          }
+          findFirst: {
+            args: Prisma.SellerFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SellerFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerPayload>
+          }
+          findMany: {
+            args: Prisma.SellerFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerPayload>[]
+          }
+          create: {
+            args: Prisma.SellerCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerPayload>
+          }
+          createMany: {
+            args: Prisma.SellerCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SellerCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerPayload>[]
+          }
+          delete: {
+            args: Prisma.SellerDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerPayload>
+          }
+          update: {
+            args: Prisma.SellerUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerPayload>
+          }
+          deleteMany: {
+            args: Prisma.SellerDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SellerUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.SellerUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerPayload>
+          }
+          aggregate: {
+            args: Prisma.SellerAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSeller>
+          }
+          groupBy: {
+            args: Prisma.SellerGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SellerGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SellerCountArgs<ExtArgs>
+            result: $Utils.Optional<SellerCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1497,12 +1583,14 @@ export namespace Prisma {
     balances: number
     docs_from: number
     docs_to: number
+    sellers: number
   }
 
   export type WarehouseCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     balances?: boolean | WarehouseCountOutputTypeCountBalancesArgs
     docs_from?: boolean | WarehouseCountOutputTypeCountDocs_fromArgs
     docs_to?: boolean | WarehouseCountOutputTypeCountDocs_toArgs
+    sellers?: boolean | WarehouseCountOutputTypeCountSellersArgs
   }
 
   // Custom InputTypes
@@ -1537,6 +1625,13 @@ export namespace Prisma {
     where?: InventoryDocumentWhereInput
   }
 
+  /**
+   * WarehouseCountOutputType without action
+   */
+  export type WarehouseCountOutputTypeCountSellersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SellerWhereInput
+  }
+
 
   /**
    * Count Type InventoryDocumentCountOutputType
@@ -1566,6 +1661,37 @@ export namespace Prisma {
    */
   export type InventoryDocumentCountOutputTypeCountLinesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: InventoryDocumentLineWhereInput
+  }
+
+
+  /**
+   * Count Type SellerCountOutputType
+   */
+
+  export type SellerCountOutputType = {
+    documents: number
+  }
+
+  export type SellerCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    documents?: boolean | SellerCountOutputTypeCountDocumentsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * SellerCountOutputType without action
+   */
+  export type SellerCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerCountOutputType
+     */
+    select?: SellerCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * SellerCountOutputType without action
+   */
+  export type SellerCountOutputTypeCountDocumentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: InventoryDocumentWhereInput
   }
 
 
@@ -2378,6 +2504,7 @@ export namespace Prisma {
      * The data used to create many Users.
      */
     data: UserCreateManyInput | UserCreateManyInput[]
+    skipDuplicates?: boolean
   }
 
   /**
@@ -2392,6 +2519,7 @@ export namespace Prisma {
      * The data used to create many Users.
      */
     data: UserCreateManyInput | UserCreateManyInput[]
+    skipDuplicates?: boolean
   }
 
   /**
@@ -3422,6 +3550,7 @@ export namespace Prisma {
      * The data used to create many Products.
      */
     data: ProductCreateManyInput | ProductCreateManyInput[]
+    skipDuplicates?: boolean
   }
 
   /**
@@ -3436,6 +3565,7 @@ export namespace Prisma {
      * The data used to create many Products.
      */
     data: ProductCreateManyInput | ProductCreateManyInput[]
+    skipDuplicates?: boolean
   }
 
   /**
@@ -3824,6 +3954,7 @@ export namespace Prisma {
     balances?: boolean | Warehouse$balancesArgs<ExtArgs>
     docs_from?: boolean | Warehouse$docs_fromArgs<ExtArgs>
     docs_to?: boolean | Warehouse$docs_toArgs<ExtArgs>
+    sellers?: boolean | Warehouse$sellersArgs<ExtArgs>
     _count?: boolean | WarehouseCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["warehouse"]>
 
@@ -3851,6 +3982,7 @@ export namespace Prisma {
     balances?: boolean | Warehouse$balancesArgs<ExtArgs>
     docs_from?: boolean | Warehouse$docs_fromArgs<ExtArgs>
     docs_to?: boolean | Warehouse$docs_toArgs<ExtArgs>
+    sellers?: boolean | Warehouse$sellersArgs<ExtArgs>
     _count?: boolean | WarehouseCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type WarehouseIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -3861,6 +3993,7 @@ export namespace Prisma {
       balances: Prisma.$InventoryBalancePayload<ExtArgs>[]
       docs_from: Prisma.$InventoryDocumentPayload<ExtArgs>[]
       docs_to: Prisma.$InventoryDocumentPayload<ExtArgs>[]
+      sellers: Prisma.$SellerPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
@@ -4237,6 +4370,7 @@ export namespace Prisma {
     balances<T extends Warehouse$balancesArgs<ExtArgs> = {}>(args?: Subset<T, Warehouse$balancesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InventoryBalancePayload<ExtArgs>, T, "findMany"> | Null>
     docs_from<T extends Warehouse$docs_fromArgs<ExtArgs> = {}>(args?: Subset<T, Warehouse$docs_fromArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InventoryDocumentPayload<ExtArgs>, T, "findMany"> | Null>
     docs_to<T extends Warehouse$docs_toArgs<ExtArgs> = {}>(args?: Subset<T, Warehouse$docs_toArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InventoryDocumentPayload<ExtArgs>, T, "findMany"> | Null>
+    sellers<T extends Warehouse$sellersArgs<ExtArgs> = {}>(args?: Subset<T, Warehouse$sellersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SellerPayload<ExtArgs>, T, "findMany"> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4478,6 +4612,7 @@ export namespace Prisma {
      * The data used to create many Warehouses.
      */
     data: WarehouseCreateManyInput | WarehouseCreateManyInput[]
+    skipDuplicates?: boolean
   }
 
   /**
@@ -4492,6 +4627,7 @@ export namespace Prisma {
      * The data used to create many Warehouses.
      */
     data: WarehouseCreateManyInput | WarehouseCreateManyInput[]
+    skipDuplicates?: boolean
   }
 
   /**
@@ -4642,6 +4778,26 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: InventoryDocumentScalarFieldEnum | InventoryDocumentScalarFieldEnum[]
+  }
+
+  /**
+   * Warehouse.sellers
+   */
+  export type Warehouse$sellersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Seller
+     */
+    select?: SellerSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerInclude<ExtArgs> | null
+    where?: SellerWhereInput
+    orderBy?: SellerOrderByWithRelationInput | SellerOrderByWithRelationInput[]
+    cursor?: SellerWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SellerScalarFieldEnum | SellerScalarFieldEnum[]
   }
 
   /**
@@ -5561,6 +5717,7 @@ export namespace Prisma {
      * The data used to create many InventoryBalances.
      */
     data: InventoryBalanceCreateManyInput | InventoryBalanceCreateManyInput[]
+    skipDuplicates?: boolean
   }
 
   /**
@@ -5575,6 +5732,7 @@ export namespace Prisma {
      * The data used to create many InventoryBalances.
      */
     data: InventoryBalanceCreateManyInput | InventoryBalanceCreateManyInput[]
+    skipDuplicates?: boolean
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -5703,6 +5861,7 @@ export namespace Prisma {
     warehouse_from_id: number | null
     warehouse_to_id: number | null
     third_party_id: number | null
+    seller_id: number | null
     created_by: number | null
     approved_by: number | null
   }
@@ -5712,6 +5871,7 @@ export namespace Prisma {
     warehouse_from_id: number | null
     warehouse_to_id: number | null
     third_party_id: number | null
+    seller_id: number | null
     created_by: number | null
     approved_by: number | null
   }
@@ -5724,6 +5884,7 @@ export namespace Prisma {
     warehouse_from_id: number | null
     warehouse_to_id: number | null
     third_party_id: number | null
+    seller_id: number | null
     date: Date | null
     notes: string | null
     created_by: number | null
@@ -5739,6 +5900,7 @@ export namespace Prisma {
     warehouse_from_id: number | null
     warehouse_to_id: number | null
     third_party_id: number | null
+    seller_id: number | null
     date: Date | null
     notes: string | null
     created_by: number | null
@@ -5754,6 +5916,7 @@ export namespace Prisma {
     warehouse_from_id: number
     warehouse_to_id: number
     third_party_id: number
+    seller_id: number
     date: number
     notes: number
     created_by: number
@@ -5768,6 +5931,7 @@ export namespace Prisma {
     warehouse_from_id?: true
     warehouse_to_id?: true
     third_party_id?: true
+    seller_id?: true
     created_by?: true
     approved_by?: true
   }
@@ -5777,6 +5941,7 @@ export namespace Prisma {
     warehouse_from_id?: true
     warehouse_to_id?: true
     third_party_id?: true
+    seller_id?: true
     created_by?: true
     approved_by?: true
   }
@@ -5789,6 +5954,7 @@ export namespace Prisma {
     warehouse_from_id?: true
     warehouse_to_id?: true
     third_party_id?: true
+    seller_id?: true
     date?: true
     notes?: true
     created_by?: true
@@ -5804,6 +5970,7 @@ export namespace Prisma {
     warehouse_from_id?: true
     warehouse_to_id?: true
     third_party_id?: true
+    seller_id?: true
     date?: true
     notes?: true
     created_by?: true
@@ -5819,6 +5986,7 @@ export namespace Prisma {
     warehouse_from_id?: true
     warehouse_to_id?: true
     third_party_id?: true
+    seller_id?: true
     date?: true
     notes?: true
     created_by?: true
@@ -5921,6 +6089,7 @@ export namespace Prisma {
     warehouse_from_id: number | null
     warehouse_to_id: number | null
     third_party_id: number | null
+    seller_id: number | null
     date: Date
     notes: string | null
     created_by: number
@@ -5955,6 +6124,7 @@ export namespace Prisma {
     warehouse_from_id?: boolean
     warehouse_to_id?: boolean
     third_party_id?: boolean
+    seller_id?: boolean
     date?: boolean
     notes?: boolean
     created_by?: boolean
@@ -5962,6 +6132,7 @@ export namespace Prisma {
     attachment_url?: boolean
     warehouse_from?: boolean | InventoryDocument$warehouse_fromArgs<ExtArgs>
     warehouse_to?: boolean | InventoryDocument$warehouse_toArgs<ExtArgs>
+    seller?: boolean | InventoryDocument$sellerArgs<ExtArgs>
     lines?: boolean | InventoryDocument$linesArgs<ExtArgs>
     _count?: boolean | InventoryDocumentCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["inventoryDocument"]>
@@ -5974,6 +6145,7 @@ export namespace Prisma {
     warehouse_from_id?: boolean
     warehouse_to_id?: boolean
     third_party_id?: boolean
+    seller_id?: boolean
     date?: boolean
     notes?: boolean
     created_by?: boolean
@@ -5981,6 +6153,7 @@ export namespace Prisma {
     attachment_url?: boolean
     warehouse_from?: boolean | InventoryDocument$warehouse_fromArgs<ExtArgs>
     warehouse_to?: boolean | InventoryDocument$warehouse_toArgs<ExtArgs>
+    seller?: boolean | InventoryDocument$sellerArgs<ExtArgs>
   }, ExtArgs["result"]["inventoryDocument"]>
 
   export type InventoryDocumentSelectScalar = {
@@ -5991,6 +6164,7 @@ export namespace Prisma {
     warehouse_from_id?: boolean
     warehouse_to_id?: boolean
     third_party_id?: boolean
+    seller_id?: boolean
     date?: boolean
     notes?: boolean
     created_by?: boolean
@@ -6001,12 +6175,14 @@ export namespace Prisma {
   export type InventoryDocumentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     warehouse_from?: boolean | InventoryDocument$warehouse_fromArgs<ExtArgs>
     warehouse_to?: boolean | InventoryDocument$warehouse_toArgs<ExtArgs>
+    seller?: boolean | InventoryDocument$sellerArgs<ExtArgs>
     lines?: boolean | InventoryDocument$linesArgs<ExtArgs>
     _count?: boolean | InventoryDocumentCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type InventoryDocumentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     warehouse_from?: boolean | InventoryDocument$warehouse_fromArgs<ExtArgs>
     warehouse_to?: boolean | InventoryDocument$warehouse_toArgs<ExtArgs>
+    seller?: boolean | InventoryDocument$sellerArgs<ExtArgs>
   }
 
   export type $InventoryDocumentPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -6014,6 +6190,7 @@ export namespace Prisma {
     objects: {
       warehouse_from: Prisma.$WarehousePayload<ExtArgs> | null
       warehouse_to: Prisma.$WarehousePayload<ExtArgs> | null
+      seller: Prisma.$SellerPayload<ExtArgs> | null
       lines: Prisma.$InventoryDocumentLinePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -6024,6 +6201,7 @@ export namespace Prisma {
       warehouse_from_id: number | null
       warehouse_to_id: number | null
       third_party_id: number | null
+      seller_id: number | null
       date: Date
       notes: string | null
       created_by: number
@@ -6395,6 +6573,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     warehouse_from<T extends InventoryDocument$warehouse_fromArgs<ExtArgs> = {}>(args?: Subset<T, InventoryDocument$warehouse_fromArgs<ExtArgs>>): Prisma__WarehouseClient<$Result.GetResult<Prisma.$WarehousePayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
     warehouse_to<T extends InventoryDocument$warehouse_toArgs<ExtArgs> = {}>(args?: Subset<T, InventoryDocument$warehouse_toArgs<ExtArgs>>): Prisma__WarehouseClient<$Result.GetResult<Prisma.$WarehousePayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
+    seller<T extends InventoryDocument$sellerArgs<ExtArgs> = {}>(args?: Subset<T, InventoryDocument$sellerArgs<ExtArgs>>): Prisma__SellerClient<$Result.GetResult<Prisma.$SellerPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
     lines<T extends InventoryDocument$linesArgs<ExtArgs> = {}>(args?: Subset<T, InventoryDocument$linesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InventoryDocumentLinePayload<ExtArgs>, T, "findMany"> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -6432,6 +6611,7 @@ export namespace Prisma {
     readonly warehouse_from_id: FieldRef<"InventoryDocument", 'Int'>
     readonly warehouse_to_id: FieldRef<"InventoryDocument", 'Int'>
     readonly third_party_id: FieldRef<"InventoryDocument", 'Int'>
+    readonly seller_id: FieldRef<"InventoryDocument", 'Int'>
     readonly date: FieldRef<"InventoryDocument", 'DateTime'>
     readonly notes: FieldRef<"InventoryDocument", 'String'>
     readonly created_by: FieldRef<"InventoryDocument", 'Int'>
@@ -6642,6 +6822,7 @@ export namespace Prisma {
      * The data used to create many InventoryDocuments.
      */
     data: InventoryDocumentCreateManyInput | InventoryDocumentCreateManyInput[]
+    skipDuplicates?: boolean
   }
 
   /**
@@ -6656,6 +6837,7 @@ export namespace Prisma {
      * The data used to create many InventoryDocuments.
      */
     data: InventoryDocumentCreateManyInput | InventoryDocumentCreateManyInput[]
+    skipDuplicates?: boolean
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -6780,6 +6962,21 @@ export namespace Prisma {
      */
     include?: WarehouseInclude<ExtArgs> | null
     where?: WarehouseWhereInput
+  }
+
+  /**
+   * InventoryDocument.seller
+   */
+  export type InventoryDocument$sellerArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Seller
+     */
+    select?: SellerSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerInclude<ExtArgs> | null
+    where?: SellerWhereInput
   }
 
   /**
@@ -7739,6 +7936,7 @@ export namespace Prisma {
      * The data used to create many InventoryDocumentLines.
      */
     data: InventoryDocumentLineCreateManyInput | InventoryDocumentLineCreateManyInput[]
+    skipDuplicates?: boolean
   }
 
   /**
@@ -7753,6 +7951,7 @@ export namespace Prisma {
      * The data used to create many InventoryDocumentLines.
      */
     data: InventoryDocumentLineCreateManyInput | InventoryDocumentLineCreateManyInput[]
+    skipDuplicates?: boolean
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -8852,6 +9051,7 @@ export namespace Prisma {
      * The data used to create many InventoryLedgers.
      */
     data: InventoryLedgerCreateManyInput | InventoryLedgerCreateManyInput[]
+    skipDuplicates?: boolean
   }
 
   /**
@@ -8866,6 +9066,7 @@ export namespace Prisma {
      * The data used to create many InventoryLedgers.
      */
     data: InventoryLedgerCreateManyInput | InventoryLedgerCreateManyInput[]
+    skipDuplicates?: boolean
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -9838,6 +10039,7 @@ export namespace Prisma {
      * The data used to create many AuditLogs.
      */
     data: AuditLogCreateManyInput | AuditLogCreateManyInput[]
+    skipDuplicates?: boolean
   }
 
   /**
@@ -9852,6 +10054,7 @@ export namespace Prisma {
      * The data used to create many AuditLogs.
      */
     data: AuditLogCreateManyInput | AuditLogCreateManyInput[]
+    skipDuplicates?: boolean
   }
 
   /**
@@ -9944,10 +10147,1022 @@ export namespace Prisma {
 
 
   /**
+   * Model Seller
+   */
+
+  export type AggregateSeller = {
+    _count: SellerCountAggregateOutputType | null
+    _avg: SellerAvgAggregateOutputType | null
+    _sum: SellerSumAggregateOutputType | null
+    _min: SellerMinAggregateOutputType | null
+    _max: SellerMaxAggregateOutputType | null
+  }
+
+  export type SellerAvgAggregateOutputType = {
+    id: number | null
+    warehouse_id: number | null
+  }
+
+  export type SellerSumAggregateOutputType = {
+    id: number | null
+    warehouse_id: number | null
+  }
+
+  export type SellerMinAggregateOutputType = {
+    id: number | null
+    name: string | null
+    code: string | null
+    warehouse_id: number | null
+    active: boolean | null
+    created_at: Date | null
+  }
+
+  export type SellerMaxAggregateOutputType = {
+    id: number | null
+    name: string | null
+    code: string | null
+    warehouse_id: number | null
+    active: boolean | null
+    created_at: Date | null
+  }
+
+  export type SellerCountAggregateOutputType = {
+    id: number
+    name: number
+    code: number
+    warehouse_id: number
+    active: number
+    created_at: number
+    _all: number
+  }
+
+
+  export type SellerAvgAggregateInputType = {
+    id?: true
+    warehouse_id?: true
+  }
+
+  export type SellerSumAggregateInputType = {
+    id?: true
+    warehouse_id?: true
+  }
+
+  export type SellerMinAggregateInputType = {
+    id?: true
+    name?: true
+    code?: true
+    warehouse_id?: true
+    active?: true
+    created_at?: true
+  }
+
+  export type SellerMaxAggregateInputType = {
+    id?: true
+    name?: true
+    code?: true
+    warehouse_id?: true
+    active?: true
+    created_at?: true
+  }
+
+  export type SellerCountAggregateInputType = {
+    id?: true
+    name?: true
+    code?: true
+    warehouse_id?: true
+    active?: true
+    created_at?: true
+    _all?: true
+  }
+
+  export type SellerAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Seller to aggregate.
+     */
+    where?: SellerWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Sellers to fetch.
+     */
+    orderBy?: SellerOrderByWithRelationInput | SellerOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SellerWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Sellers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Sellers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Sellers
+    **/
+    _count?: true | SellerCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: SellerAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: SellerSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SellerMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SellerMaxAggregateInputType
+  }
+
+  export type GetSellerAggregateType<T extends SellerAggregateArgs> = {
+        [P in keyof T & keyof AggregateSeller]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSeller[P]>
+      : GetScalarType<T[P], AggregateSeller[P]>
+  }
+
+
+
+
+  export type SellerGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SellerWhereInput
+    orderBy?: SellerOrderByWithAggregationInput | SellerOrderByWithAggregationInput[]
+    by: SellerScalarFieldEnum[] | SellerScalarFieldEnum
+    having?: SellerScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SellerCountAggregateInputType | true
+    _avg?: SellerAvgAggregateInputType
+    _sum?: SellerSumAggregateInputType
+    _min?: SellerMinAggregateInputType
+    _max?: SellerMaxAggregateInputType
+  }
+
+  export type SellerGroupByOutputType = {
+    id: number
+    name: string
+    code: string
+    warehouse_id: number
+    active: boolean
+    created_at: Date
+    _count: SellerCountAggregateOutputType | null
+    _avg: SellerAvgAggregateOutputType | null
+    _sum: SellerSumAggregateOutputType | null
+    _min: SellerMinAggregateOutputType | null
+    _max: SellerMaxAggregateOutputType | null
+  }
+
+  type GetSellerGroupByPayload<T extends SellerGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SellerGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SellerGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SellerGroupByOutputType[P]>
+            : GetScalarType<T[P], SellerGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SellerSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    code?: boolean
+    warehouse_id?: boolean
+    active?: boolean
+    created_at?: boolean
+    warehouse?: boolean | WarehouseDefaultArgs<ExtArgs>
+    documents?: boolean | Seller$documentsArgs<ExtArgs>
+    _count?: boolean | SellerCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["seller"]>
+
+  export type SellerSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    code?: boolean
+    warehouse_id?: boolean
+    active?: boolean
+    created_at?: boolean
+    warehouse?: boolean | WarehouseDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["seller"]>
+
+  export type SellerSelectScalar = {
+    id?: boolean
+    name?: boolean
+    code?: boolean
+    warehouse_id?: boolean
+    active?: boolean
+    created_at?: boolean
+  }
+
+  export type SellerInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    warehouse?: boolean | WarehouseDefaultArgs<ExtArgs>
+    documents?: boolean | Seller$documentsArgs<ExtArgs>
+    _count?: boolean | SellerCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type SellerIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    warehouse?: boolean | WarehouseDefaultArgs<ExtArgs>
+  }
+
+  export type $SellerPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Seller"
+    objects: {
+      warehouse: Prisma.$WarehousePayload<ExtArgs>
+      documents: Prisma.$InventoryDocumentPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      name: string
+      code: string
+      warehouse_id: number
+      active: boolean
+      created_at: Date
+    }, ExtArgs["result"]["seller"]>
+    composites: {}
+  }
+
+  type SellerGetPayload<S extends boolean | null | undefined | SellerDefaultArgs> = $Result.GetResult<Prisma.$SellerPayload, S>
+
+  type SellerCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<SellerFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: SellerCountAggregateInputType | true
+    }
+
+  export interface SellerDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Seller'], meta: { name: 'Seller' } }
+    /**
+     * Find zero or one Seller that matches the filter.
+     * @param {SellerFindUniqueArgs} args - Arguments to find a Seller
+     * @example
+     * // Get one Seller
+     * const seller = await prisma.seller.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SellerFindUniqueArgs>(args: SelectSubset<T, SellerFindUniqueArgs<ExtArgs>>): Prisma__SellerClient<$Result.GetResult<Prisma.$SellerPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one Seller that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {SellerFindUniqueOrThrowArgs} args - Arguments to find a Seller
+     * @example
+     * // Get one Seller
+     * const seller = await prisma.seller.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SellerFindUniqueOrThrowArgs>(args: SelectSubset<T, SellerFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SellerClient<$Result.GetResult<Prisma.$SellerPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first Seller that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SellerFindFirstArgs} args - Arguments to find a Seller
+     * @example
+     * // Get one Seller
+     * const seller = await prisma.seller.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SellerFindFirstArgs>(args?: SelectSubset<T, SellerFindFirstArgs<ExtArgs>>): Prisma__SellerClient<$Result.GetResult<Prisma.$SellerPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first Seller that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SellerFindFirstOrThrowArgs} args - Arguments to find a Seller
+     * @example
+     * // Get one Seller
+     * const seller = await prisma.seller.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SellerFindFirstOrThrowArgs>(args?: SelectSubset<T, SellerFindFirstOrThrowArgs<ExtArgs>>): Prisma__SellerClient<$Result.GetResult<Prisma.$SellerPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more Sellers that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SellerFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Sellers
+     * const sellers = await prisma.seller.findMany()
+     * 
+     * // Get first 10 Sellers
+     * const sellers = await prisma.seller.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const sellerWithIdOnly = await prisma.seller.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SellerFindManyArgs>(args?: SelectSubset<T, SellerFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SellerPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a Seller.
+     * @param {SellerCreateArgs} args - Arguments to create a Seller.
+     * @example
+     * // Create one Seller
+     * const Seller = await prisma.seller.create({
+     *   data: {
+     *     // ... data to create a Seller
+     *   }
+     * })
+     * 
+     */
+    create<T extends SellerCreateArgs>(args: SelectSubset<T, SellerCreateArgs<ExtArgs>>): Prisma__SellerClient<$Result.GetResult<Prisma.$SellerPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many Sellers.
+     * @param {SellerCreateManyArgs} args - Arguments to create many Sellers.
+     * @example
+     * // Create many Sellers
+     * const seller = await prisma.seller.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SellerCreateManyArgs>(args?: SelectSubset<T, SellerCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Sellers and returns the data saved in the database.
+     * @param {SellerCreateManyAndReturnArgs} args - Arguments to create many Sellers.
+     * @example
+     * // Create many Sellers
+     * const seller = await prisma.seller.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Sellers and only return the `id`
+     * const sellerWithIdOnly = await prisma.seller.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SellerCreateManyAndReturnArgs>(args?: SelectSubset<T, SellerCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SellerPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a Seller.
+     * @param {SellerDeleteArgs} args - Arguments to delete one Seller.
+     * @example
+     * // Delete one Seller
+     * const Seller = await prisma.seller.delete({
+     *   where: {
+     *     // ... filter to delete one Seller
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SellerDeleteArgs>(args: SelectSubset<T, SellerDeleteArgs<ExtArgs>>): Prisma__SellerClient<$Result.GetResult<Prisma.$SellerPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one Seller.
+     * @param {SellerUpdateArgs} args - Arguments to update one Seller.
+     * @example
+     * // Update one Seller
+     * const seller = await prisma.seller.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SellerUpdateArgs>(args: SelectSubset<T, SellerUpdateArgs<ExtArgs>>): Prisma__SellerClient<$Result.GetResult<Prisma.$SellerPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more Sellers.
+     * @param {SellerDeleteManyArgs} args - Arguments to filter Sellers to delete.
+     * @example
+     * // Delete a few Sellers
+     * const { count } = await prisma.seller.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SellerDeleteManyArgs>(args?: SelectSubset<T, SellerDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Sellers.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SellerUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Sellers
+     * const seller = await prisma.seller.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SellerUpdateManyArgs>(args: SelectSubset<T, SellerUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one Seller.
+     * @param {SellerUpsertArgs} args - Arguments to update or create a Seller.
+     * @example
+     * // Update or create a Seller
+     * const seller = await prisma.seller.upsert({
+     *   create: {
+     *     // ... data to create a Seller
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Seller we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SellerUpsertArgs>(args: SelectSubset<T, SellerUpsertArgs<ExtArgs>>): Prisma__SellerClient<$Result.GetResult<Prisma.$SellerPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of Sellers.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SellerCountArgs} args - Arguments to filter Sellers to count.
+     * @example
+     * // Count the number of Sellers
+     * const count = await prisma.seller.count({
+     *   where: {
+     *     // ... the filter for the Sellers we want to count
+     *   }
+     * })
+    **/
+    count<T extends SellerCountArgs>(
+      args?: Subset<T, SellerCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SellerCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Seller.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SellerAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SellerAggregateArgs>(args: Subset<T, SellerAggregateArgs>): Prisma.PrismaPromise<GetSellerAggregateType<T>>
+
+    /**
+     * Group by Seller.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SellerGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SellerGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SellerGroupByArgs['orderBy'] }
+        : { orderBy?: SellerGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SellerGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSellerGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Seller model
+   */
+  readonly fields: SellerFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Seller.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SellerClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    warehouse<T extends WarehouseDefaultArgs<ExtArgs> = {}>(args?: Subset<T, WarehouseDefaultArgs<ExtArgs>>): Prisma__WarehouseClient<$Result.GetResult<Prisma.$WarehousePayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    documents<T extends Seller$documentsArgs<ExtArgs> = {}>(args?: Subset<T, Seller$documentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InventoryDocumentPayload<ExtArgs>, T, "findMany"> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Seller model
+   */ 
+  interface SellerFieldRefs {
+    readonly id: FieldRef<"Seller", 'Int'>
+    readonly name: FieldRef<"Seller", 'String'>
+    readonly code: FieldRef<"Seller", 'String'>
+    readonly warehouse_id: FieldRef<"Seller", 'Int'>
+    readonly active: FieldRef<"Seller", 'Boolean'>
+    readonly created_at: FieldRef<"Seller", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Seller findUnique
+   */
+  export type SellerFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Seller
+     */
+    select?: SellerSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerInclude<ExtArgs> | null
+    /**
+     * Filter, which Seller to fetch.
+     */
+    where: SellerWhereUniqueInput
+  }
+
+  /**
+   * Seller findUniqueOrThrow
+   */
+  export type SellerFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Seller
+     */
+    select?: SellerSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerInclude<ExtArgs> | null
+    /**
+     * Filter, which Seller to fetch.
+     */
+    where: SellerWhereUniqueInput
+  }
+
+  /**
+   * Seller findFirst
+   */
+  export type SellerFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Seller
+     */
+    select?: SellerSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerInclude<ExtArgs> | null
+    /**
+     * Filter, which Seller to fetch.
+     */
+    where?: SellerWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Sellers to fetch.
+     */
+    orderBy?: SellerOrderByWithRelationInput | SellerOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Sellers.
+     */
+    cursor?: SellerWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Sellers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Sellers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Sellers.
+     */
+    distinct?: SellerScalarFieldEnum | SellerScalarFieldEnum[]
+  }
+
+  /**
+   * Seller findFirstOrThrow
+   */
+  export type SellerFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Seller
+     */
+    select?: SellerSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerInclude<ExtArgs> | null
+    /**
+     * Filter, which Seller to fetch.
+     */
+    where?: SellerWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Sellers to fetch.
+     */
+    orderBy?: SellerOrderByWithRelationInput | SellerOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Sellers.
+     */
+    cursor?: SellerWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Sellers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Sellers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Sellers.
+     */
+    distinct?: SellerScalarFieldEnum | SellerScalarFieldEnum[]
+  }
+
+  /**
+   * Seller findMany
+   */
+  export type SellerFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Seller
+     */
+    select?: SellerSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerInclude<ExtArgs> | null
+    /**
+     * Filter, which Sellers to fetch.
+     */
+    where?: SellerWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Sellers to fetch.
+     */
+    orderBy?: SellerOrderByWithRelationInput | SellerOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Sellers.
+     */
+    cursor?: SellerWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Sellers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Sellers.
+     */
+    skip?: number
+    distinct?: SellerScalarFieldEnum | SellerScalarFieldEnum[]
+  }
+
+  /**
+   * Seller create
+   */
+  export type SellerCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Seller
+     */
+    select?: SellerSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Seller.
+     */
+    data: XOR<SellerCreateInput, SellerUncheckedCreateInput>
+  }
+
+  /**
+   * Seller createMany
+   */
+  export type SellerCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Sellers.
+     */
+    data: SellerCreateManyInput | SellerCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Seller createManyAndReturn
+   */
+  export type SellerCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Seller
+     */
+    select?: SellerSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many Sellers.
+     */
+    data: SellerCreateManyInput | SellerCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Seller update
+   */
+  export type SellerUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Seller
+     */
+    select?: SellerSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Seller.
+     */
+    data: XOR<SellerUpdateInput, SellerUncheckedUpdateInput>
+    /**
+     * Choose, which Seller to update.
+     */
+    where: SellerWhereUniqueInput
+  }
+
+  /**
+   * Seller updateMany
+   */
+  export type SellerUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Sellers.
+     */
+    data: XOR<SellerUpdateManyMutationInput, SellerUncheckedUpdateManyInput>
+    /**
+     * Filter which Sellers to update
+     */
+    where?: SellerWhereInput
+  }
+
+  /**
+   * Seller upsert
+   */
+  export type SellerUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Seller
+     */
+    select?: SellerSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Seller to update in case it exists.
+     */
+    where: SellerWhereUniqueInput
+    /**
+     * In case the Seller found by the `where` argument doesn't exist, create a new Seller with this data.
+     */
+    create: XOR<SellerCreateInput, SellerUncheckedCreateInput>
+    /**
+     * In case the Seller was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SellerUpdateInput, SellerUncheckedUpdateInput>
+  }
+
+  /**
+   * Seller delete
+   */
+  export type SellerDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Seller
+     */
+    select?: SellerSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerInclude<ExtArgs> | null
+    /**
+     * Filter which Seller to delete.
+     */
+    where: SellerWhereUniqueInput
+  }
+
+  /**
+   * Seller deleteMany
+   */
+  export type SellerDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Sellers to delete
+     */
+    where?: SellerWhereInput
+  }
+
+  /**
+   * Seller.documents
+   */
+  export type Seller$documentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InventoryDocument
+     */
+    select?: InventoryDocumentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InventoryDocumentInclude<ExtArgs> | null
+    where?: InventoryDocumentWhereInput
+    orderBy?: InventoryDocumentOrderByWithRelationInput | InventoryDocumentOrderByWithRelationInput[]
+    cursor?: InventoryDocumentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: InventoryDocumentScalarFieldEnum | InventoryDocumentScalarFieldEnum[]
+  }
+
+  /**
+   * Seller without action
+   */
+  export type SellerDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Seller
+     */
+    select?: SellerSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
   export const TransactionIsolationLevel: {
+    ReadUncommitted: 'ReadUncommitted',
+    ReadCommitted: 'ReadCommitted',
+    RepeatableRead: 'RepeatableRead',
     Serializable: 'Serializable'
   };
 
@@ -10018,6 +11233,7 @@ export namespace Prisma {
     warehouse_from_id: 'warehouse_from_id',
     warehouse_to_id: 'warehouse_to_id',
     third_party_id: 'third_party_id',
+    seller_id: 'seller_id',
     date: 'date',
     notes: 'notes',
     created_by: 'created_by',
@@ -10078,12 +11294,32 @@ export namespace Prisma {
   export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typeof AuditLogScalarFieldEnum]
 
 
+  export const SellerScalarFieldEnum: {
+    id: 'id',
+    name: 'name',
+    code: 'code',
+    warehouse_id: 'warehouse_id',
+    active: 'active',
+    created_at: 'created_at'
+  };
+
+  export type SellerScalarFieldEnum = (typeof SellerScalarFieldEnum)[keyof typeof SellerScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
   };
 
   export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+  export const QueryMode: {
+    default: 'default',
+    insensitive: 'insensitive'
+  };
+
+  export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
 
 
   export const NullsOrder: {
@@ -10107,9 +11343,23 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'Int[]'
+   */
+  export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+  /**
    * Reference to a field of type 'String'
    */
   export type StringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String'>
+    
+
+
+  /**
+   * Reference to a field of type 'String[]'
+   */
+  export type ListStringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String[]'>
     
 
 
@@ -10128,9 +11378,23 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'Float[]'
+   */
+  export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
+    
+
+
+  /**
    * Reference to a field of type 'DateTime'
    */
   export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
+    
+
+
+  /**
+   * Reference to a field of type 'DateTime[]'
+   */
+  export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
     
   /**
    * Deep Input Types
@@ -10303,6 +11567,7 @@ export namespace Prisma {
     balances?: InventoryBalanceListRelationFilter
     docs_from?: InventoryDocumentListRelationFilter
     docs_to?: InventoryDocumentListRelationFilter
+    sellers?: SellerListRelationFilter
   }
 
   export type WarehouseOrderByWithRelationInput = {
@@ -10316,6 +11581,7 @@ export namespace Prisma {
     balances?: InventoryBalanceOrderByRelationAggregateInput
     docs_from?: InventoryDocumentOrderByRelationAggregateInput
     docs_to?: InventoryDocumentOrderByRelationAggregateInput
+    sellers?: SellerOrderByRelationAggregateInput
   }
 
   export type WarehouseWhereUniqueInput = Prisma.AtLeast<{
@@ -10332,6 +11598,7 @@ export namespace Prisma {
     balances?: InventoryBalanceListRelationFilter
     docs_from?: InventoryDocumentListRelationFilter
     docs_to?: InventoryDocumentListRelationFilter
+    sellers?: SellerListRelationFilter
   }, "id">
 
   export type WarehouseOrderByWithAggregationInput = {
@@ -10449,6 +11716,7 @@ export namespace Prisma {
     warehouse_from_id?: IntNullableFilter<"InventoryDocument"> | number | null
     warehouse_to_id?: IntNullableFilter<"InventoryDocument"> | number | null
     third_party_id?: IntNullableFilter<"InventoryDocument"> | number | null
+    seller_id?: IntNullableFilter<"InventoryDocument"> | number | null
     date?: DateTimeFilter<"InventoryDocument"> | Date | string
     notes?: StringNullableFilter<"InventoryDocument"> | string | null
     created_by?: IntFilter<"InventoryDocument"> | number
@@ -10456,6 +11724,7 @@ export namespace Prisma {
     attachment_url?: StringNullableFilter<"InventoryDocument"> | string | null
     warehouse_from?: XOR<WarehouseNullableRelationFilter, WarehouseWhereInput> | null
     warehouse_to?: XOR<WarehouseNullableRelationFilter, WarehouseWhereInput> | null
+    seller?: XOR<SellerNullableRelationFilter, SellerWhereInput> | null
     lines?: InventoryDocumentLineListRelationFilter
   }
 
@@ -10467,6 +11736,7 @@ export namespace Prisma {
     warehouse_from_id?: SortOrderInput | SortOrder
     warehouse_to_id?: SortOrderInput | SortOrder
     third_party_id?: SortOrderInput | SortOrder
+    seller_id?: SortOrderInput | SortOrder
     date?: SortOrder
     notes?: SortOrderInput | SortOrder
     created_by?: SortOrder
@@ -10474,6 +11744,7 @@ export namespace Prisma {
     attachment_url?: SortOrderInput | SortOrder
     warehouse_from?: WarehouseOrderByWithRelationInput
     warehouse_to?: WarehouseOrderByWithRelationInput
+    seller?: SellerOrderByWithRelationInput
     lines?: InventoryDocumentLineOrderByRelationAggregateInput
   }
 
@@ -10488,6 +11759,7 @@ export namespace Prisma {
     warehouse_from_id?: IntNullableFilter<"InventoryDocument"> | number | null
     warehouse_to_id?: IntNullableFilter<"InventoryDocument"> | number | null
     third_party_id?: IntNullableFilter<"InventoryDocument"> | number | null
+    seller_id?: IntNullableFilter<"InventoryDocument"> | number | null
     date?: DateTimeFilter<"InventoryDocument"> | Date | string
     notes?: StringNullableFilter<"InventoryDocument"> | string | null
     created_by?: IntFilter<"InventoryDocument"> | number
@@ -10495,6 +11767,7 @@ export namespace Prisma {
     attachment_url?: StringNullableFilter<"InventoryDocument"> | string | null
     warehouse_from?: XOR<WarehouseNullableRelationFilter, WarehouseWhereInput> | null
     warehouse_to?: XOR<WarehouseNullableRelationFilter, WarehouseWhereInput> | null
+    seller?: XOR<SellerNullableRelationFilter, SellerWhereInput> | null
     lines?: InventoryDocumentLineListRelationFilter
   }, "id" | "document_number">
 
@@ -10506,6 +11779,7 @@ export namespace Prisma {
     warehouse_from_id?: SortOrderInput | SortOrder
     warehouse_to_id?: SortOrderInput | SortOrder
     third_party_id?: SortOrderInput | SortOrder
+    seller_id?: SortOrderInput | SortOrder
     date?: SortOrder
     notes?: SortOrderInput | SortOrder
     created_by?: SortOrder
@@ -10529,6 +11803,7 @@ export namespace Prisma {
     warehouse_from_id?: IntNullableWithAggregatesFilter<"InventoryDocument"> | number | null
     warehouse_to_id?: IntNullableWithAggregatesFilter<"InventoryDocument"> | number | null
     third_party_id?: IntNullableWithAggregatesFilter<"InventoryDocument"> | number | null
+    seller_id?: IntNullableWithAggregatesFilter<"InventoryDocument"> | number | null
     date?: DateTimeWithAggregatesFilter<"InventoryDocument"> | Date | string
     notes?: StringNullableWithAggregatesFilter<"InventoryDocument"> | string | null
     created_by?: IntWithAggregatesFilter<"InventoryDocument"> | number
@@ -10792,6 +12067,71 @@ export namespace Prisma {
     ip?: StringNullableWithAggregatesFilter<"AuditLog"> | string | null
   }
 
+  export type SellerWhereInput = {
+    AND?: SellerWhereInput | SellerWhereInput[]
+    OR?: SellerWhereInput[]
+    NOT?: SellerWhereInput | SellerWhereInput[]
+    id?: IntFilter<"Seller"> | number
+    name?: StringFilter<"Seller"> | string
+    code?: StringFilter<"Seller"> | string
+    warehouse_id?: IntFilter<"Seller"> | number
+    active?: BoolFilter<"Seller"> | boolean
+    created_at?: DateTimeFilter<"Seller"> | Date | string
+    warehouse?: XOR<WarehouseRelationFilter, WarehouseWhereInput>
+    documents?: InventoryDocumentListRelationFilter
+  }
+
+  export type SellerOrderByWithRelationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    code?: SortOrder
+    warehouse_id?: SortOrder
+    active?: SortOrder
+    created_at?: SortOrder
+    warehouse?: WarehouseOrderByWithRelationInput
+    documents?: InventoryDocumentOrderByRelationAggregateInput
+  }
+
+  export type SellerWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    code?: string
+    AND?: SellerWhereInput | SellerWhereInput[]
+    OR?: SellerWhereInput[]
+    NOT?: SellerWhereInput | SellerWhereInput[]
+    name?: StringFilter<"Seller"> | string
+    warehouse_id?: IntFilter<"Seller"> | number
+    active?: BoolFilter<"Seller"> | boolean
+    created_at?: DateTimeFilter<"Seller"> | Date | string
+    warehouse?: XOR<WarehouseRelationFilter, WarehouseWhereInput>
+    documents?: InventoryDocumentListRelationFilter
+  }, "id" | "code">
+
+  export type SellerOrderByWithAggregationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    code?: SortOrder
+    warehouse_id?: SortOrder
+    active?: SortOrder
+    created_at?: SortOrder
+    _count?: SellerCountOrderByAggregateInput
+    _avg?: SellerAvgOrderByAggregateInput
+    _max?: SellerMaxOrderByAggregateInput
+    _min?: SellerMinOrderByAggregateInput
+    _sum?: SellerSumOrderByAggregateInput
+  }
+
+  export type SellerScalarWhereWithAggregatesInput = {
+    AND?: SellerScalarWhereWithAggregatesInput | SellerScalarWhereWithAggregatesInput[]
+    OR?: SellerScalarWhereWithAggregatesInput[]
+    NOT?: SellerScalarWhereWithAggregatesInput | SellerScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"Seller"> | number
+    name?: StringWithAggregatesFilter<"Seller"> | string
+    code?: StringWithAggregatesFilter<"Seller"> | string
+    warehouse_id?: IntWithAggregatesFilter<"Seller"> | number
+    active?: BoolWithAggregatesFilter<"Seller"> | boolean
+    created_at?: DateTimeWithAggregatesFilter<"Seller"> | Date | string
+  }
+
   export type UserCreateInput = {
     email: string
     password: string
@@ -10969,6 +12309,7 @@ export namespace Prisma {
     balances?: InventoryBalanceCreateNestedManyWithoutWarehouseInput
     docs_from?: InventoryDocumentCreateNestedManyWithoutWarehouse_fromInput
     docs_to?: InventoryDocumentCreateNestedManyWithoutWarehouse_toInput
+    sellers?: SellerCreateNestedManyWithoutWarehouseInput
   }
 
   export type WarehouseUncheckedCreateInput = {
@@ -10982,6 +12323,7 @@ export namespace Prisma {
     balances?: InventoryBalanceUncheckedCreateNestedManyWithoutWarehouseInput
     docs_from?: InventoryDocumentUncheckedCreateNestedManyWithoutWarehouse_fromInput
     docs_to?: InventoryDocumentUncheckedCreateNestedManyWithoutWarehouse_toInput
+    sellers?: SellerUncheckedCreateNestedManyWithoutWarehouseInput
   }
 
   export type WarehouseUpdateInput = {
@@ -10994,6 +12336,7 @@ export namespace Prisma {
     balances?: InventoryBalanceUpdateManyWithoutWarehouseNestedInput
     docs_from?: InventoryDocumentUpdateManyWithoutWarehouse_fromNestedInput
     docs_to?: InventoryDocumentUpdateManyWithoutWarehouse_toNestedInput
+    sellers?: SellerUpdateManyWithoutWarehouseNestedInput
   }
 
   export type WarehouseUncheckedUpdateInput = {
@@ -11007,6 +12350,7 @@ export namespace Prisma {
     balances?: InventoryBalanceUncheckedUpdateManyWithoutWarehouseNestedInput
     docs_from?: InventoryDocumentUncheckedUpdateManyWithoutWarehouse_fromNestedInput
     docs_to?: InventoryDocumentUncheckedUpdateManyWithoutWarehouse_toNestedInput
+    sellers?: SellerUncheckedUpdateManyWithoutWarehouseNestedInput
   }
 
   export type WarehouseCreateManyInput = {
@@ -11122,6 +12466,7 @@ export namespace Prisma {
     attachment_url?: string | null
     warehouse_from?: WarehouseCreateNestedOneWithoutDocs_fromInput
     warehouse_to?: WarehouseCreateNestedOneWithoutDocs_toInput
+    seller?: SellerCreateNestedOneWithoutDocumentsInput
     lines?: InventoryDocumentLineCreateNestedManyWithoutDocumentInput
   }
 
@@ -11133,6 +12478,7 @@ export namespace Prisma {
     warehouse_from_id?: number | null
     warehouse_to_id?: number | null
     third_party_id?: number | null
+    seller_id?: number | null
     date: Date | string
     notes?: string | null
     created_by: number
@@ -11153,6 +12499,7 @@ export namespace Prisma {
     attachment_url?: NullableStringFieldUpdateOperationsInput | string | null
     warehouse_from?: WarehouseUpdateOneWithoutDocs_fromNestedInput
     warehouse_to?: WarehouseUpdateOneWithoutDocs_toNestedInput
+    seller?: SellerUpdateOneWithoutDocumentsNestedInput
     lines?: InventoryDocumentLineUpdateManyWithoutDocumentNestedInput
   }
 
@@ -11164,6 +12511,7 @@ export namespace Prisma {
     warehouse_from_id?: NullableIntFieldUpdateOperationsInput | number | null
     warehouse_to_id?: NullableIntFieldUpdateOperationsInput | number | null
     third_party_id?: NullableIntFieldUpdateOperationsInput | number | null
+    seller_id?: NullableIntFieldUpdateOperationsInput | number | null
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     created_by?: IntFieldUpdateOperationsInput | number
@@ -11180,6 +12528,7 @@ export namespace Prisma {
     warehouse_from_id?: number | null
     warehouse_to_id?: number | null
     third_party_id?: number | null
+    seller_id?: number | null
     date: Date | string
     notes?: string | null
     created_by: number
@@ -11207,6 +12556,7 @@ export namespace Prisma {
     warehouse_from_id?: NullableIntFieldUpdateOperationsInput | number | null
     warehouse_to_id?: NullableIntFieldUpdateOperationsInput | number | null
     third_party_id?: NullableIntFieldUpdateOperationsInput | number | null
+    seller_id?: NullableIntFieldUpdateOperationsInput | number | null
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     created_by?: IntFieldUpdateOperationsInput | number
@@ -11489,10 +12839,73 @@ export namespace Prisma {
     ip?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
+  export type SellerCreateInput = {
+    name: string
+    code: string
+    active?: boolean
+    created_at?: Date | string
+    warehouse: WarehouseCreateNestedOneWithoutSellersInput
+    documents?: InventoryDocumentCreateNestedManyWithoutSellerInput
+  }
+
+  export type SellerUncheckedCreateInput = {
+    id?: number
+    name: string
+    code: string
+    warehouse_id: number
+    active?: boolean
+    created_at?: Date | string
+    documents?: InventoryDocumentUncheckedCreateNestedManyWithoutSellerInput
+  }
+
+  export type SellerUpdateInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    active?: BoolFieldUpdateOperationsInput | boolean
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    warehouse?: WarehouseUpdateOneRequiredWithoutSellersNestedInput
+    documents?: InventoryDocumentUpdateManyWithoutSellerNestedInput
+  }
+
+  export type SellerUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    warehouse_id?: IntFieldUpdateOperationsInput | number
+    active?: BoolFieldUpdateOperationsInput | boolean
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    documents?: InventoryDocumentUncheckedUpdateManyWithoutSellerNestedInput
+  }
+
+  export type SellerCreateManyInput = {
+    id?: number
+    name: string
+    code: string
+    warehouse_id: number
+    active?: boolean
+    created_at?: Date | string
+  }
+
+  export type SellerUpdateManyMutationInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    active?: BoolFieldUpdateOperationsInput | boolean
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SellerUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    warehouse_id?: IntFieldUpdateOperationsInput | number
+    active?: BoolFieldUpdateOperationsInput | boolean
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type IntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
     lt?: number | IntFieldRefInput<$PrismaModel>
     lte?: number | IntFieldRefInput<$PrismaModel>
     gt?: number | IntFieldRefInput<$PrismaModel>
@@ -11502,8 +12915,8 @@ export namespace Prisma {
 
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
-    in?: string[]
-    notIn?: string[]
+    in?: string[] | ListStringFieldRefInput<$PrismaModel>
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
     lt?: string | StringFieldRefInput<$PrismaModel>
     lte?: string | StringFieldRefInput<$PrismaModel>
     gt?: string | StringFieldRefInput<$PrismaModel>
@@ -11511,6 +12924,7 @@ export namespace Prisma {
     contains?: string | StringFieldRefInput<$PrismaModel>
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
@@ -11548,8 +12962,8 @@ export namespace Prisma {
 
   export type IntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
     lt?: number | IntFieldRefInput<$PrismaModel>
     lte?: number | IntFieldRefInput<$PrismaModel>
     gt?: number | IntFieldRefInput<$PrismaModel>
@@ -11564,8 +12978,8 @@ export namespace Prisma {
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
-    in?: string[]
-    notIn?: string[]
+    in?: string[] | ListStringFieldRefInput<$PrismaModel>
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
     lt?: string | StringFieldRefInput<$PrismaModel>
     lte?: string | StringFieldRefInput<$PrismaModel>
     gt?: string | StringFieldRefInput<$PrismaModel>
@@ -11573,6 +12987,7 @@ export namespace Prisma {
     contains?: string | StringFieldRefInput<$PrismaModel>
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
     not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedStringFilter<$PrismaModel>
@@ -11581,8 +12996,8 @@ export namespace Prisma {
 
   export type StringNullableFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | null
-    notIn?: string[] | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
     lt?: string | StringFieldRefInput<$PrismaModel>
     lte?: string | StringFieldRefInput<$PrismaModel>
     gt?: string | StringFieldRefInput<$PrismaModel>
@@ -11590,6 +13005,7 @@ export namespace Prisma {
     contains?: string | StringFieldRefInput<$PrismaModel>
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
@@ -11600,8 +13016,8 @@ export namespace Prisma {
 
   export type FloatNullableFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | null
-    notIn?: number[] | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
     lt?: number | FloatFieldRefInput<$PrismaModel>
     lte?: number | FloatFieldRefInput<$PrismaModel>
     gt?: number | FloatFieldRefInput<$PrismaModel>
@@ -11611,8 +13027,8 @@ export namespace Prisma {
 
   export type DateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[]
-    notIn?: Date[] | string[]
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
     lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
@@ -11714,8 +13130,8 @@ export namespace Prisma {
 
   export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | null
-    notIn?: string[] | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
     lt?: string | StringFieldRefInput<$PrismaModel>
     lte?: string | StringFieldRefInput<$PrismaModel>
     gt?: string | StringFieldRefInput<$PrismaModel>
@@ -11723,6 +13139,7 @@ export namespace Prisma {
     contains?: string | StringFieldRefInput<$PrismaModel>
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
     not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedStringNullableFilter<$PrismaModel>
@@ -11739,8 +13156,8 @@ export namespace Prisma {
 
   export type FloatNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | null
-    notIn?: number[] | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
     lt?: number | FloatFieldRefInput<$PrismaModel>
     lte?: number | FloatFieldRefInput<$PrismaModel>
     gt?: number | FloatFieldRefInput<$PrismaModel>
@@ -11755,8 +13172,8 @@ export namespace Prisma {
 
   export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[]
-    notIn?: Date[] | string[]
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
     lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
@@ -11769,8 +13186,8 @@ export namespace Prisma {
 
   export type IntNullableFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | null
-    notIn?: number[] | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
     lt?: number | IntFieldRefInput<$PrismaModel>
     lte?: number | IntFieldRefInput<$PrismaModel>
     gt?: number | IntFieldRefInput<$PrismaModel>
@@ -11784,7 +13201,17 @@ export namespace Prisma {
     none?: InventoryDocumentWhereInput
   }
 
+  export type SellerListRelationFilter = {
+    every?: SellerWhereInput
+    some?: SellerWhereInput
+    none?: SellerWhereInput
+  }
+
   export type InventoryDocumentOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type SellerOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -11830,8 +13257,8 @@ export namespace Prisma {
 
   export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | null
-    notIn?: number[] | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
     lt?: number | IntFieldRefInput<$PrismaModel>
     lte?: number | IntFieldRefInput<$PrismaModel>
     gt?: number | IntFieldRefInput<$PrismaModel>
@@ -11846,8 +13273,8 @@ export namespace Prisma {
 
   export type FloatFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
     lt?: number | FloatFieldRefInput<$PrismaModel>
     lte?: number | FloatFieldRefInput<$PrismaModel>
     gt?: number | FloatFieldRefInput<$PrismaModel>
@@ -11924,8 +13351,8 @@ export namespace Prisma {
 
   export type FloatWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
     lt?: number | FloatFieldRefInput<$PrismaModel>
     lte?: number | FloatFieldRefInput<$PrismaModel>
     gt?: number | FloatFieldRefInput<$PrismaModel>
@@ -11943,6 +13370,11 @@ export namespace Prisma {
     isNot?: WarehouseWhereInput | null
   }
 
+  export type SellerNullableRelationFilter = {
+    is?: SellerWhereInput | null
+    isNot?: SellerWhereInput | null
+  }
+
   export type InventoryDocumentCountOrderByAggregateInput = {
     id?: SortOrder
     doc_type?: SortOrder
@@ -11951,6 +13383,7 @@ export namespace Prisma {
     warehouse_from_id?: SortOrder
     warehouse_to_id?: SortOrder
     third_party_id?: SortOrder
+    seller_id?: SortOrder
     date?: SortOrder
     notes?: SortOrder
     created_by?: SortOrder
@@ -11963,6 +13396,7 @@ export namespace Prisma {
     warehouse_from_id?: SortOrder
     warehouse_to_id?: SortOrder
     third_party_id?: SortOrder
+    seller_id?: SortOrder
     created_by?: SortOrder
     approved_by?: SortOrder
   }
@@ -11975,6 +13409,7 @@ export namespace Prisma {
     warehouse_from_id?: SortOrder
     warehouse_to_id?: SortOrder
     third_party_id?: SortOrder
+    seller_id?: SortOrder
     date?: SortOrder
     notes?: SortOrder
     created_by?: SortOrder
@@ -11990,6 +13425,7 @@ export namespace Prisma {
     warehouse_from_id?: SortOrder
     warehouse_to_id?: SortOrder
     third_party_id?: SortOrder
+    seller_id?: SortOrder
     date?: SortOrder
     notes?: SortOrder
     created_by?: SortOrder
@@ -12002,6 +13438,7 @@ export namespace Prisma {
     warehouse_from_id?: SortOrder
     warehouse_to_id?: SortOrder
     third_party_id?: SortOrder
+    seller_id?: SortOrder
     created_by?: SortOrder
     approved_by?: SortOrder
   }
@@ -12196,6 +13633,43 @@ export namespace Prisma {
     user_id?: SortOrder
   }
 
+  export type SellerCountOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    code?: SortOrder
+    warehouse_id?: SortOrder
+    active?: SortOrder
+    created_at?: SortOrder
+  }
+
+  export type SellerAvgOrderByAggregateInput = {
+    id?: SortOrder
+    warehouse_id?: SortOrder
+  }
+
+  export type SellerMaxOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    code?: SortOrder
+    warehouse_id?: SortOrder
+    active?: SortOrder
+    created_at?: SortOrder
+  }
+
+  export type SellerMinOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    code?: SortOrder
+    warehouse_id?: SortOrder
+    active?: SortOrder
+    created_at?: SortOrder
+  }
+
+  export type SellerSumOrderByAggregateInput = {
+    id?: SortOrder
+    warehouse_id?: SortOrder
+  }
+
   export type StringFieldUpdateOperationsInput = {
     set?: string
   }
@@ -12375,6 +13849,13 @@ export namespace Prisma {
     connect?: InventoryDocumentWhereUniqueInput | InventoryDocumentWhereUniqueInput[]
   }
 
+  export type SellerCreateNestedManyWithoutWarehouseInput = {
+    create?: XOR<SellerCreateWithoutWarehouseInput, SellerUncheckedCreateWithoutWarehouseInput> | SellerCreateWithoutWarehouseInput[] | SellerUncheckedCreateWithoutWarehouseInput[]
+    connectOrCreate?: SellerCreateOrConnectWithoutWarehouseInput | SellerCreateOrConnectWithoutWarehouseInput[]
+    createMany?: SellerCreateManyWarehouseInputEnvelope
+    connect?: SellerWhereUniqueInput | SellerWhereUniqueInput[]
+  }
+
   export type InventoryBalanceUncheckedCreateNestedManyWithoutWarehouseInput = {
     create?: XOR<InventoryBalanceCreateWithoutWarehouseInput, InventoryBalanceUncheckedCreateWithoutWarehouseInput> | InventoryBalanceCreateWithoutWarehouseInput[] | InventoryBalanceUncheckedCreateWithoutWarehouseInput[]
     connectOrCreate?: InventoryBalanceCreateOrConnectWithoutWarehouseInput | InventoryBalanceCreateOrConnectWithoutWarehouseInput[]
@@ -12394,6 +13875,13 @@ export namespace Prisma {
     connectOrCreate?: InventoryDocumentCreateOrConnectWithoutWarehouse_toInput | InventoryDocumentCreateOrConnectWithoutWarehouse_toInput[]
     createMany?: InventoryDocumentCreateManyWarehouse_toInputEnvelope
     connect?: InventoryDocumentWhereUniqueInput | InventoryDocumentWhereUniqueInput[]
+  }
+
+  export type SellerUncheckedCreateNestedManyWithoutWarehouseInput = {
+    create?: XOR<SellerCreateWithoutWarehouseInput, SellerUncheckedCreateWithoutWarehouseInput> | SellerCreateWithoutWarehouseInput[] | SellerUncheckedCreateWithoutWarehouseInput[]
+    connectOrCreate?: SellerCreateOrConnectWithoutWarehouseInput | SellerCreateOrConnectWithoutWarehouseInput[]
+    createMany?: SellerCreateManyWarehouseInputEnvelope
+    connect?: SellerWhereUniqueInput | SellerWhereUniqueInput[]
   }
 
   export type NullableIntFieldUpdateOperationsInput = {
@@ -12446,6 +13934,20 @@ export namespace Prisma {
     deleteMany?: InventoryDocumentScalarWhereInput | InventoryDocumentScalarWhereInput[]
   }
 
+  export type SellerUpdateManyWithoutWarehouseNestedInput = {
+    create?: XOR<SellerCreateWithoutWarehouseInput, SellerUncheckedCreateWithoutWarehouseInput> | SellerCreateWithoutWarehouseInput[] | SellerUncheckedCreateWithoutWarehouseInput[]
+    connectOrCreate?: SellerCreateOrConnectWithoutWarehouseInput | SellerCreateOrConnectWithoutWarehouseInput[]
+    upsert?: SellerUpsertWithWhereUniqueWithoutWarehouseInput | SellerUpsertWithWhereUniqueWithoutWarehouseInput[]
+    createMany?: SellerCreateManyWarehouseInputEnvelope
+    set?: SellerWhereUniqueInput | SellerWhereUniqueInput[]
+    disconnect?: SellerWhereUniqueInput | SellerWhereUniqueInput[]
+    delete?: SellerWhereUniqueInput | SellerWhereUniqueInput[]
+    connect?: SellerWhereUniqueInput | SellerWhereUniqueInput[]
+    update?: SellerUpdateWithWhereUniqueWithoutWarehouseInput | SellerUpdateWithWhereUniqueWithoutWarehouseInput[]
+    updateMany?: SellerUpdateManyWithWhereWithoutWarehouseInput | SellerUpdateManyWithWhereWithoutWarehouseInput[]
+    deleteMany?: SellerScalarWhereInput | SellerScalarWhereInput[]
+  }
+
   export type InventoryBalanceUncheckedUpdateManyWithoutWarehouseNestedInput = {
     create?: XOR<InventoryBalanceCreateWithoutWarehouseInput, InventoryBalanceUncheckedCreateWithoutWarehouseInput> | InventoryBalanceCreateWithoutWarehouseInput[] | InventoryBalanceUncheckedCreateWithoutWarehouseInput[]
     connectOrCreate?: InventoryBalanceCreateOrConnectWithoutWarehouseInput | InventoryBalanceCreateOrConnectWithoutWarehouseInput[]
@@ -12486,6 +13988,20 @@ export namespace Prisma {
     update?: InventoryDocumentUpdateWithWhereUniqueWithoutWarehouse_toInput | InventoryDocumentUpdateWithWhereUniqueWithoutWarehouse_toInput[]
     updateMany?: InventoryDocumentUpdateManyWithWhereWithoutWarehouse_toInput | InventoryDocumentUpdateManyWithWhereWithoutWarehouse_toInput[]
     deleteMany?: InventoryDocumentScalarWhereInput | InventoryDocumentScalarWhereInput[]
+  }
+
+  export type SellerUncheckedUpdateManyWithoutWarehouseNestedInput = {
+    create?: XOR<SellerCreateWithoutWarehouseInput, SellerUncheckedCreateWithoutWarehouseInput> | SellerCreateWithoutWarehouseInput[] | SellerUncheckedCreateWithoutWarehouseInput[]
+    connectOrCreate?: SellerCreateOrConnectWithoutWarehouseInput | SellerCreateOrConnectWithoutWarehouseInput[]
+    upsert?: SellerUpsertWithWhereUniqueWithoutWarehouseInput | SellerUpsertWithWhereUniqueWithoutWarehouseInput[]
+    createMany?: SellerCreateManyWarehouseInputEnvelope
+    set?: SellerWhereUniqueInput | SellerWhereUniqueInput[]
+    disconnect?: SellerWhereUniqueInput | SellerWhereUniqueInput[]
+    delete?: SellerWhereUniqueInput | SellerWhereUniqueInput[]
+    connect?: SellerWhereUniqueInput | SellerWhereUniqueInput[]
+    update?: SellerUpdateWithWhereUniqueWithoutWarehouseInput | SellerUpdateWithWhereUniqueWithoutWarehouseInput[]
+    updateMany?: SellerUpdateManyWithWhereWithoutWarehouseInput | SellerUpdateManyWithWhereWithoutWarehouseInput[]
+    deleteMany?: SellerScalarWhereInput | SellerScalarWhereInput[]
   }
 
   export type ProductCreateNestedOneWithoutBalancesInput = {
@@ -12536,6 +14052,12 @@ export namespace Prisma {
     connect?: WarehouseWhereUniqueInput
   }
 
+  export type SellerCreateNestedOneWithoutDocumentsInput = {
+    create?: XOR<SellerCreateWithoutDocumentsInput, SellerUncheckedCreateWithoutDocumentsInput>
+    connectOrCreate?: SellerCreateOrConnectWithoutDocumentsInput
+    connect?: SellerWhereUniqueInput
+  }
+
   export type InventoryDocumentLineCreateNestedManyWithoutDocumentInput = {
     create?: XOR<InventoryDocumentLineCreateWithoutDocumentInput, InventoryDocumentLineUncheckedCreateWithoutDocumentInput> | InventoryDocumentLineCreateWithoutDocumentInput[] | InventoryDocumentLineUncheckedCreateWithoutDocumentInput[]
     connectOrCreate?: InventoryDocumentLineCreateOrConnectWithoutDocumentInput | InventoryDocumentLineCreateOrConnectWithoutDocumentInput[]
@@ -12568,6 +14090,16 @@ export namespace Prisma {
     delete?: WarehouseWhereInput | boolean
     connect?: WarehouseWhereUniqueInput
     update?: XOR<XOR<WarehouseUpdateToOneWithWhereWithoutDocs_toInput, WarehouseUpdateWithoutDocs_toInput>, WarehouseUncheckedUpdateWithoutDocs_toInput>
+  }
+
+  export type SellerUpdateOneWithoutDocumentsNestedInput = {
+    create?: XOR<SellerCreateWithoutDocumentsInput, SellerUncheckedCreateWithoutDocumentsInput>
+    connectOrCreate?: SellerCreateOrConnectWithoutDocumentsInput
+    upsert?: SellerUpsertWithoutDocumentsInput
+    disconnect?: SellerWhereInput | boolean
+    delete?: SellerWhereInput | boolean
+    connect?: SellerWhereUniqueInput
+    update?: XOR<XOR<SellerUpdateToOneWithWhereWithoutDocumentsInput, SellerUpdateWithoutDocumentsInput>, SellerUncheckedUpdateWithoutDocumentsInput>
   }
 
   export type InventoryDocumentLineUpdateManyWithoutDocumentNestedInput = {
@@ -12640,10 +14172,66 @@ export namespace Prisma {
     update?: XOR<XOR<ProductUpdateToOneWithWhereWithoutLedgerInput, ProductUpdateWithoutLedgerInput>, ProductUncheckedUpdateWithoutLedgerInput>
   }
 
+  export type WarehouseCreateNestedOneWithoutSellersInput = {
+    create?: XOR<WarehouseCreateWithoutSellersInput, WarehouseUncheckedCreateWithoutSellersInput>
+    connectOrCreate?: WarehouseCreateOrConnectWithoutSellersInput
+    connect?: WarehouseWhereUniqueInput
+  }
+
+  export type InventoryDocumentCreateNestedManyWithoutSellerInput = {
+    create?: XOR<InventoryDocumentCreateWithoutSellerInput, InventoryDocumentUncheckedCreateWithoutSellerInput> | InventoryDocumentCreateWithoutSellerInput[] | InventoryDocumentUncheckedCreateWithoutSellerInput[]
+    connectOrCreate?: InventoryDocumentCreateOrConnectWithoutSellerInput | InventoryDocumentCreateOrConnectWithoutSellerInput[]
+    createMany?: InventoryDocumentCreateManySellerInputEnvelope
+    connect?: InventoryDocumentWhereUniqueInput | InventoryDocumentWhereUniqueInput[]
+  }
+
+  export type InventoryDocumentUncheckedCreateNestedManyWithoutSellerInput = {
+    create?: XOR<InventoryDocumentCreateWithoutSellerInput, InventoryDocumentUncheckedCreateWithoutSellerInput> | InventoryDocumentCreateWithoutSellerInput[] | InventoryDocumentUncheckedCreateWithoutSellerInput[]
+    connectOrCreate?: InventoryDocumentCreateOrConnectWithoutSellerInput | InventoryDocumentCreateOrConnectWithoutSellerInput[]
+    createMany?: InventoryDocumentCreateManySellerInputEnvelope
+    connect?: InventoryDocumentWhereUniqueInput | InventoryDocumentWhereUniqueInput[]
+  }
+
+  export type WarehouseUpdateOneRequiredWithoutSellersNestedInput = {
+    create?: XOR<WarehouseCreateWithoutSellersInput, WarehouseUncheckedCreateWithoutSellersInput>
+    connectOrCreate?: WarehouseCreateOrConnectWithoutSellersInput
+    upsert?: WarehouseUpsertWithoutSellersInput
+    connect?: WarehouseWhereUniqueInput
+    update?: XOR<XOR<WarehouseUpdateToOneWithWhereWithoutSellersInput, WarehouseUpdateWithoutSellersInput>, WarehouseUncheckedUpdateWithoutSellersInput>
+  }
+
+  export type InventoryDocumentUpdateManyWithoutSellerNestedInput = {
+    create?: XOR<InventoryDocumentCreateWithoutSellerInput, InventoryDocumentUncheckedCreateWithoutSellerInput> | InventoryDocumentCreateWithoutSellerInput[] | InventoryDocumentUncheckedCreateWithoutSellerInput[]
+    connectOrCreate?: InventoryDocumentCreateOrConnectWithoutSellerInput | InventoryDocumentCreateOrConnectWithoutSellerInput[]
+    upsert?: InventoryDocumentUpsertWithWhereUniqueWithoutSellerInput | InventoryDocumentUpsertWithWhereUniqueWithoutSellerInput[]
+    createMany?: InventoryDocumentCreateManySellerInputEnvelope
+    set?: InventoryDocumentWhereUniqueInput | InventoryDocumentWhereUniqueInput[]
+    disconnect?: InventoryDocumentWhereUniqueInput | InventoryDocumentWhereUniqueInput[]
+    delete?: InventoryDocumentWhereUniqueInput | InventoryDocumentWhereUniqueInput[]
+    connect?: InventoryDocumentWhereUniqueInput | InventoryDocumentWhereUniqueInput[]
+    update?: InventoryDocumentUpdateWithWhereUniqueWithoutSellerInput | InventoryDocumentUpdateWithWhereUniqueWithoutSellerInput[]
+    updateMany?: InventoryDocumentUpdateManyWithWhereWithoutSellerInput | InventoryDocumentUpdateManyWithWhereWithoutSellerInput[]
+    deleteMany?: InventoryDocumentScalarWhereInput | InventoryDocumentScalarWhereInput[]
+  }
+
+  export type InventoryDocumentUncheckedUpdateManyWithoutSellerNestedInput = {
+    create?: XOR<InventoryDocumentCreateWithoutSellerInput, InventoryDocumentUncheckedCreateWithoutSellerInput> | InventoryDocumentCreateWithoutSellerInput[] | InventoryDocumentUncheckedCreateWithoutSellerInput[]
+    connectOrCreate?: InventoryDocumentCreateOrConnectWithoutSellerInput | InventoryDocumentCreateOrConnectWithoutSellerInput[]
+    upsert?: InventoryDocumentUpsertWithWhereUniqueWithoutSellerInput | InventoryDocumentUpsertWithWhereUniqueWithoutSellerInput[]
+    createMany?: InventoryDocumentCreateManySellerInputEnvelope
+    set?: InventoryDocumentWhereUniqueInput | InventoryDocumentWhereUniqueInput[]
+    disconnect?: InventoryDocumentWhereUniqueInput | InventoryDocumentWhereUniqueInput[]
+    delete?: InventoryDocumentWhereUniqueInput | InventoryDocumentWhereUniqueInput[]
+    connect?: InventoryDocumentWhereUniqueInput | InventoryDocumentWhereUniqueInput[]
+    update?: InventoryDocumentUpdateWithWhereUniqueWithoutSellerInput | InventoryDocumentUpdateWithWhereUniqueWithoutSellerInput[]
+    updateMany?: InventoryDocumentUpdateManyWithWhereWithoutSellerInput | InventoryDocumentUpdateManyWithWhereWithoutSellerInput[]
+    deleteMany?: InventoryDocumentScalarWhereInput | InventoryDocumentScalarWhereInput[]
+  }
+
   export type NestedIntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
     lt?: number | IntFieldRefInput<$PrismaModel>
     lte?: number | IntFieldRefInput<$PrismaModel>
     gt?: number | IntFieldRefInput<$PrismaModel>
@@ -12653,8 +14241,8 @@ export namespace Prisma {
 
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
-    in?: string[]
-    notIn?: string[]
+    in?: string[] | ListStringFieldRefInput<$PrismaModel>
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
     lt?: string | StringFieldRefInput<$PrismaModel>
     lte?: string | StringFieldRefInput<$PrismaModel>
     gt?: string | StringFieldRefInput<$PrismaModel>
@@ -12667,8 +14255,8 @@ export namespace Prisma {
 
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
     lt?: number | IntFieldRefInput<$PrismaModel>
     lte?: number | IntFieldRefInput<$PrismaModel>
     gt?: number | IntFieldRefInput<$PrismaModel>
@@ -12683,8 +14271,8 @@ export namespace Prisma {
 
   export type NestedFloatFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
     lt?: number | FloatFieldRefInput<$PrismaModel>
     lte?: number | FloatFieldRefInput<$PrismaModel>
     gt?: number | FloatFieldRefInput<$PrismaModel>
@@ -12694,8 +14282,8 @@ export namespace Prisma {
 
   export type NestedStringWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
-    in?: string[]
-    notIn?: string[]
+    in?: string[] | ListStringFieldRefInput<$PrismaModel>
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
     lt?: string | StringFieldRefInput<$PrismaModel>
     lte?: string | StringFieldRefInput<$PrismaModel>
     gt?: string | StringFieldRefInput<$PrismaModel>
@@ -12711,8 +14299,8 @@ export namespace Prisma {
 
   export type NestedStringNullableFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | null
-    notIn?: string[] | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
     lt?: string | StringFieldRefInput<$PrismaModel>
     lte?: string | StringFieldRefInput<$PrismaModel>
     gt?: string | StringFieldRefInput<$PrismaModel>
@@ -12730,8 +14318,8 @@ export namespace Prisma {
 
   export type NestedFloatNullableFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | null
-    notIn?: number[] | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
     lt?: number | FloatFieldRefInput<$PrismaModel>
     lte?: number | FloatFieldRefInput<$PrismaModel>
     gt?: number | FloatFieldRefInput<$PrismaModel>
@@ -12741,8 +14329,8 @@ export namespace Prisma {
 
   export type NestedDateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[]
-    notIn?: Date[] | string[]
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
     lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
@@ -12752,8 +14340,8 @@ export namespace Prisma {
 
   export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | null
-    notIn?: string[] | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
     lt?: string | StringFieldRefInput<$PrismaModel>
     lte?: string | StringFieldRefInput<$PrismaModel>
     gt?: string | StringFieldRefInput<$PrismaModel>
@@ -12769,8 +14357,8 @@ export namespace Prisma {
 
   export type NestedIntNullableFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | null
-    notIn?: number[] | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
     lt?: number | IntFieldRefInput<$PrismaModel>
     lte?: number | IntFieldRefInput<$PrismaModel>
     gt?: number | IntFieldRefInput<$PrismaModel>
@@ -12788,8 +14376,8 @@ export namespace Prisma {
 
   export type NestedFloatNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | null
-    notIn?: number[] | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
     lt?: number | FloatFieldRefInput<$PrismaModel>
     lte?: number | FloatFieldRefInput<$PrismaModel>
     gt?: number | FloatFieldRefInput<$PrismaModel>
@@ -12804,8 +14392,8 @@ export namespace Prisma {
 
   export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[]
-    notIn?: Date[] | string[]
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
     lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
@@ -12818,8 +14406,8 @@ export namespace Prisma {
 
   export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | null
-    notIn?: number[] | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
     lt?: number | IntFieldRefInput<$PrismaModel>
     lte?: number | IntFieldRefInput<$PrismaModel>
     gt?: number | IntFieldRefInput<$PrismaModel>
@@ -12834,8 +14422,8 @@ export namespace Prisma {
 
   export type NestedFloatWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
     lt?: number | FloatFieldRefInput<$PrismaModel>
     lte?: number | FloatFieldRefInput<$PrismaModel>
     gt?: number | FloatFieldRefInput<$PrismaModel>
@@ -12874,6 +14462,7 @@ export namespace Prisma {
 
   export type InventoryBalanceCreateManyProductInputEnvelope = {
     data: InventoryBalanceCreateManyProductInput | InventoryBalanceCreateManyProductInput[]
+    skipDuplicates?: boolean
   }
 
   export type InventoryLedgerCreateWithoutProductInput = {
@@ -12914,6 +14503,7 @@ export namespace Prisma {
 
   export type InventoryLedgerCreateManyProductInputEnvelope = {
     data: InventoryLedgerCreateManyProductInput | InventoryLedgerCreateManyProductInput[]
+    skipDuplicates?: boolean
   }
 
   export type InventoryDocumentLineCreateWithoutProductInput = {
@@ -12944,6 +14534,7 @@ export namespace Prisma {
 
   export type InventoryDocumentLineCreateManyProductInputEnvelope = {
     data: InventoryDocumentLineCreateManyProductInput | InventoryDocumentLineCreateManyProductInput[]
+    skipDuplicates?: boolean
   }
 
   export type InventoryBalanceUpsertWithWhereUniqueWithoutProductInput = {
@@ -13069,6 +14660,7 @@ export namespace Prisma {
 
   export type InventoryBalanceCreateManyWarehouseInputEnvelope = {
     data: InventoryBalanceCreateManyWarehouseInput | InventoryBalanceCreateManyWarehouseInput[]
+    skipDuplicates?: boolean
   }
 
   export type InventoryDocumentCreateWithoutWarehouse_fromInput = {
@@ -13082,6 +14674,7 @@ export namespace Prisma {
     approved_by?: number | null
     attachment_url?: string | null
     warehouse_to?: WarehouseCreateNestedOneWithoutDocs_toInput
+    seller?: SellerCreateNestedOneWithoutDocumentsInput
     lines?: InventoryDocumentLineCreateNestedManyWithoutDocumentInput
   }
 
@@ -13092,6 +14685,7 @@ export namespace Prisma {
     status: string
     warehouse_to_id?: number | null
     third_party_id?: number | null
+    seller_id?: number | null
     date: Date | string
     notes?: string | null
     created_by: number
@@ -13107,6 +14701,7 @@ export namespace Prisma {
 
   export type InventoryDocumentCreateManyWarehouse_fromInputEnvelope = {
     data: InventoryDocumentCreateManyWarehouse_fromInput | InventoryDocumentCreateManyWarehouse_fromInput[]
+    skipDuplicates?: boolean
   }
 
   export type InventoryDocumentCreateWithoutWarehouse_toInput = {
@@ -13120,6 +14715,7 @@ export namespace Prisma {
     approved_by?: number | null
     attachment_url?: string | null
     warehouse_from?: WarehouseCreateNestedOneWithoutDocs_fromInput
+    seller?: SellerCreateNestedOneWithoutDocumentsInput
     lines?: InventoryDocumentLineCreateNestedManyWithoutDocumentInput
   }
 
@@ -13130,6 +14726,7 @@ export namespace Prisma {
     status: string
     warehouse_from_id?: number | null
     third_party_id?: number | null
+    seller_id?: number | null
     date: Date | string
     notes?: string | null
     created_by: number
@@ -13145,6 +14742,34 @@ export namespace Prisma {
 
   export type InventoryDocumentCreateManyWarehouse_toInputEnvelope = {
     data: InventoryDocumentCreateManyWarehouse_toInput | InventoryDocumentCreateManyWarehouse_toInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type SellerCreateWithoutWarehouseInput = {
+    name: string
+    code: string
+    active?: boolean
+    created_at?: Date | string
+    documents?: InventoryDocumentCreateNestedManyWithoutSellerInput
+  }
+
+  export type SellerUncheckedCreateWithoutWarehouseInput = {
+    id?: number
+    name: string
+    code: string
+    active?: boolean
+    created_at?: Date | string
+    documents?: InventoryDocumentUncheckedCreateNestedManyWithoutSellerInput
+  }
+
+  export type SellerCreateOrConnectWithoutWarehouseInput = {
+    where: SellerWhereUniqueInput
+    create: XOR<SellerCreateWithoutWarehouseInput, SellerUncheckedCreateWithoutWarehouseInput>
+  }
+
+  export type SellerCreateManyWarehouseInputEnvelope = {
+    data: SellerCreateManyWarehouseInput | SellerCreateManyWarehouseInput[]
+    skipDuplicates?: boolean
   }
 
   export type InventoryBalanceUpsertWithWhereUniqueWithoutWarehouseInput = {
@@ -13190,6 +14815,7 @@ export namespace Prisma {
     warehouse_from_id?: IntNullableFilter<"InventoryDocument"> | number | null
     warehouse_to_id?: IntNullableFilter<"InventoryDocument"> | number | null
     third_party_id?: IntNullableFilter<"InventoryDocument"> | number | null
+    seller_id?: IntNullableFilter<"InventoryDocument"> | number | null
     date?: DateTimeFilter<"InventoryDocument"> | Date | string
     notes?: StringNullableFilter<"InventoryDocument"> | string | null
     created_by?: IntFilter<"InventoryDocument"> | number
@@ -13211,6 +14837,34 @@ export namespace Prisma {
   export type InventoryDocumentUpdateManyWithWhereWithoutWarehouse_toInput = {
     where: InventoryDocumentScalarWhereInput
     data: XOR<InventoryDocumentUpdateManyMutationInput, InventoryDocumentUncheckedUpdateManyWithoutWarehouse_toInput>
+  }
+
+  export type SellerUpsertWithWhereUniqueWithoutWarehouseInput = {
+    where: SellerWhereUniqueInput
+    update: XOR<SellerUpdateWithoutWarehouseInput, SellerUncheckedUpdateWithoutWarehouseInput>
+    create: XOR<SellerCreateWithoutWarehouseInput, SellerUncheckedCreateWithoutWarehouseInput>
+  }
+
+  export type SellerUpdateWithWhereUniqueWithoutWarehouseInput = {
+    where: SellerWhereUniqueInput
+    data: XOR<SellerUpdateWithoutWarehouseInput, SellerUncheckedUpdateWithoutWarehouseInput>
+  }
+
+  export type SellerUpdateManyWithWhereWithoutWarehouseInput = {
+    where: SellerScalarWhereInput
+    data: XOR<SellerUpdateManyMutationInput, SellerUncheckedUpdateManyWithoutWarehouseInput>
+  }
+
+  export type SellerScalarWhereInput = {
+    AND?: SellerScalarWhereInput | SellerScalarWhereInput[]
+    OR?: SellerScalarWhereInput[]
+    NOT?: SellerScalarWhereInput | SellerScalarWhereInput[]
+    id?: IntFilter<"Seller"> | number
+    name?: StringFilter<"Seller"> | string
+    code?: StringFilter<"Seller"> | string
+    warehouse_id?: IntFilter<"Seller"> | number
+    active?: BoolFilter<"Seller"> | boolean
+    created_at?: DateTimeFilter<"Seller"> | Date | string
   }
 
   export type ProductCreateWithoutBalancesInput = {
@@ -13260,6 +14914,7 @@ export namespace Prisma {
     color?: string
     docs_from?: InventoryDocumentCreateNestedManyWithoutWarehouse_fromInput
     docs_to?: InventoryDocumentCreateNestedManyWithoutWarehouse_toInput
+    sellers?: SellerCreateNestedManyWithoutWarehouseInput
   }
 
   export type WarehouseUncheckedCreateWithoutBalancesInput = {
@@ -13272,6 +14927,7 @@ export namespace Prisma {
     color?: string
     docs_from?: InventoryDocumentUncheckedCreateNestedManyWithoutWarehouse_fromInput
     docs_to?: InventoryDocumentUncheckedCreateNestedManyWithoutWarehouse_toInput
+    sellers?: SellerUncheckedCreateNestedManyWithoutWarehouseInput
   }
 
   export type WarehouseCreateOrConnectWithoutBalancesInput = {
@@ -13343,6 +14999,7 @@ export namespace Prisma {
     color?: StringFieldUpdateOperationsInput | string
     docs_from?: InventoryDocumentUpdateManyWithoutWarehouse_fromNestedInput
     docs_to?: InventoryDocumentUpdateManyWithoutWarehouse_toNestedInput
+    sellers?: SellerUpdateManyWithoutWarehouseNestedInput
   }
 
   export type WarehouseUncheckedUpdateWithoutBalancesInput = {
@@ -13355,6 +15012,7 @@ export namespace Prisma {
     color?: StringFieldUpdateOperationsInput | string
     docs_from?: InventoryDocumentUncheckedUpdateManyWithoutWarehouse_fromNestedInput
     docs_to?: InventoryDocumentUncheckedUpdateManyWithoutWarehouse_toNestedInput
+    sellers?: SellerUncheckedUpdateManyWithoutWarehouseNestedInput
   }
 
   export type WarehouseCreateWithoutDocs_fromInput = {
@@ -13366,6 +15024,7 @@ export namespace Prisma {
     color?: string
     balances?: InventoryBalanceCreateNestedManyWithoutWarehouseInput
     docs_to?: InventoryDocumentCreateNestedManyWithoutWarehouse_toInput
+    sellers?: SellerCreateNestedManyWithoutWarehouseInput
   }
 
   export type WarehouseUncheckedCreateWithoutDocs_fromInput = {
@@ -13378,6 +15037,7 @@ export namespace Prisma {
     color?: string
     balances?: InventoryBalanceUncheckedCreateNestedManyWithoutWarehouseInput
     docs_to?: InventoryDocumentUncheckedCreateNestedManyWithoutWarehouse_toInput
+    sellers?: SellerUncheckedCreateNestedManyWithoutWarehouseInput
   }
 
   export type WarehouseCreateOrConnectWithoutDocs_fromInput = {
@@ -13394,6 +15054,7 @@ export namespace Prisma {
     color?: string
     balances?: InventoryBalanceCreateNestedManyWithoutWarehouseInput
     docs_from?: InventoryDocumentCreateNestedManyWithoutWarehouse_fromInput
+    sellers?: SellerCreateNestedManyWithoutWarehouseInput
   }
 
   export type WarehouseUncheckedCreateWithoutDocs_toInput = {
@@ -13406,11 +15067,34 @@ export namespace Prisma {
     color?: string
     balances?: InventoryBalanceUncheckedCreateNestedManyWithoutWarehouseInput
     docs_from?: InventoryDocumentUncheckedCreateNestedManyWithoutWarehouse_fromInput
+    sellers?: SellerUncheckedCreateNestedManyWithoutWarehouseInput
   }
 
   export type WarehouseCreateOrConnectWithoutDocs_toInput = {
     where: WarehouseWhereUniqueInput
     create: XOR<WarehouseCreateWithoutDocs_toInput, WarehouseUncheckedCreateWithoutDocs_toInput>
+  }
+
+  export type SellerCreateWithoutDocumentsInput = {
+    name: string
+    code: string
+    active?: boolean
+    created_at?: Date | string
+    warehouse: WarehouseCreateNestedOneWithoutSellersInput
+  }
+
+  export type SellerUncheckedCreateWithoutDocumentsInput = {
+    id?: number
+    name: string
+    code: string
+    warehouse_id: number
+    active?: boolean
+    created_at?: Date | string
+  }
+
+  export type SellerCreateOrConnectWithoutDocumentsInput = {
+    where: SellerWhereUniqueInput
+    create: XOR<SellerCreateWithoutDocumentsInput, SellerUncheckedCreateWithoutDocumentsInput>
   }
 
   export type InventoryDocumentLineCreateWithoutDocumentInput = {
@@ -13441,6 +15125,7 @@ export namespace Prisma {
 
   export type InventoryDocumentLineCreateManyDocumentInputEnvelope = {
     data: InventoryDocumentLineCreateManyDocumentInput | InventoryDocumentLineCreateManyDocumentInput[]
+    skipDuplicates?: boolean
   }
 
   export type WarehouseUpsertWithoutDocs_fromInput = {
@@ -13463,6 +15148,7 @@ export namespace Prisma {
     color?: StringFieldUpdateOperationsInput | string
     balances?: InventoryBalanceUpdateManyWithoutWarehouseNestedInput
     docs_to?: InventoryDocumentUpdateManyWithoutWarehouse_toNestedInput
+    sellers?: SellerUpdateManyWithoutWarehouseNestedInput
   }
 
   export type WarehouseUncheckedUpdateWithoutDocs_fromInput = {
@@ -13475,6 +15161,7 @@ export namespace Prisma {
     color?: StringFieldUpdateOperationsInput | string
     balances?: InventoryBalanceUncheckedUpdateManyWithoutWarehouseNestedInput
     docs_to?: InventoryDocumentUncheckedUpdateManyWithoutWarehouse_toNestedInput
+    sellers?: SellerUncheckedUpdateManyWithoutWarehouseNestedInput
   }
 
   export type WarehouseUpsertWithoutDocs_toInput = {
@@ -13497,6 +15184,7 @@ export namespace Prisma {
     color?: StringFieldUpdateOperationsInput | string
     balances?: InventoryBalanceUpdateManyWithoutWarehouseNestedInput
     docs_from?: InventoryDocumentUpdateManyWithoutWarehouse_fromNestedInput
+    sellers?: SellerUpdateManyWithoutWarehouseNestedInput
   }
 
   export type WarehouseUncheckedUpdateWithoutDocs_toInput = {
@@ -13509,6 +15197,35 @@ export namespace Prisma {
     color?: StringFieldUpdateOperationsInput | string
     balances?: InventoryBalanceUncheckedUpdateManyWithoutWarehouseNestedInput
     docs_from?: InventoryDocumentUncheckedUpdateManyWithoutWarehouse_fromNestedInput
+    sellers?: SellerUncheckedUpdateManyWithoutWarehouseNestedInput
+  }
+
+  export type SellerUpsertWithoutDocumentsInput = {
+    update: XOR<SellerUpdateWithoutDocumentsInput, SellerUncheckedUpdateWithoutDocumentsInput>
+    create: XOR<SellerCreateWithoutDocumentsInput, SellerUncheckedCreateWithoutDocumentsInput>
+    where?: SellerWhereInput
+  }
+
+  export type SellerUpdateToOneWithWhereWithoutDocumentsInput = {
+    where?: SellerWhereInput
+    data: XOR<SellerUpdateWithoutDocumentsInput, SellerUncheckedUpdateWithoutDocumentsInput>
+  }
+
+  export type SellerUpdateWithoutDocumentsInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    active?: BoolFieldUpdateOperationsInput | boolean
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    warehouse?: WarehouseUpdateOneRequiredWithoutSellersNestedInput
+  }
+
+  export type SellerUncheckedUpdateWithoutDocumentsInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    warehouse_id?: IntFieldUpdateOperationsInput | number
+    active?: BoolFieldUpdateOperationsInput | boolean
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type InventoryDocumentLineUpsertWithWhereUniqueWithoutDocumentInput = {
@@ -13539,6 +15256,7 @@ export namespace Prisma {
     attachment_url?: string | null
     warehouse_from?: WarehouseCreateNestedOneWithoutDocs_fromInput
     warehouse_to?: WarehouseCreateNestedOneWithoutDocs_toInput
+    seller?: SellerCreateNestedOneWithoutDocumentsInput
   }
 
   export type InventoryDocumentUncheckedCreateWithoutLinesInput = {
@@ -13549,6 +15267,7 @@ export namespace Prisma {
     warehouse_from_id?: number | null
     warehouse_to_id?: number | null
     third_party_id?: number | null
+    seller_id?: number | null
     date: Date | string
     notes?: string | null
     created_by: number
@@ -13622,6 +15341,7 @@ export namespace Prisma {
     attachment_url?: NullableStringFieldUpdateOperationsInput | string | null
     warehouse_from?: WarehouseUpdateOneWithoutDocs_fromNestedInput
     warehouse_to?: WarehouseUpdateOneWithoutDocs_toNestedInput
+    seller?: SellerUpdateOneWithoutDocumentsNestedInput
   }
 
   export type InventoryDocumentUncheckedUpdateWithoutLinesInput = {
@@ -13632,6 +15352,7 @@ export namespace Prisma {
     warehouse_from_id?: NullableIntFieldUpdateOperationsInput | number | null
     warehouse_to_id?: NullableIntFieldUpdateOperationsInput | number | null
     third_party_id?: NullableIntFieldUpdateOperationsInput | number | null
+    seller_id?: NullableIntFieldUpdateOperationsInput | number | null
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     created_by?: IntFieldUpdateOperationsInput | number
@@ -13763,6 +15484,129 @@ export namespace Prisma {
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     balances?: InventoryBalanceUncheckedUpdateManyWithoutProductNestedInput
     doc_lines?: InventoryDocumentLineUncheckedUpdateManyWithoutProductNestedInput
+  }
+
+  export type WarehouseCreateWithoutSellersInput = {
+    name: string
+    location?: string | null
+    manager_id?: number | null
+    type: string
+    active?: boolean
+    color?: string
+    balances?: InventoryBalanceCreateNestedManyWithoutWarehouseInput
+    docs_from?: InventoryDocumentCreateNestedManyWithoutWarehouse_fromInput
+    docs_to?: InventoryDocumentCreateNestedManyWithoutWarehouse_toInput
+  }
+
+  export type WarehouseUncheckedCreateWithoutSellersInput = {
+    id?: number
+    name: string
+    location?: string | null
+    manager_id?: number | null
+    type: string
+    active?: boolean
+    color?: string
+    balances?: InventoryBalanceUncheckedCreateNestedManyWithoutWarehouseInput
+    docs_from?: InventoryDocumentUncheckedCreateNestedManyWithoutWarehouse_fromInput
+    docs_to?: InventoryDocumentUncheckedCreateNestedManyWithoutWarehouse_toInput
+  }
+
+  export type WarehouseCreateOrConnectWithoutSellersInput = {
+    where: WarehouseWhereUniqueInput
+    create: XOR<WarehouseCreateWithoutSellersInput, WarehouseUncheckedCreateWithoutSellersInput>
+  }
+
+  export type InventoryDocumentCreateWithoutSellerInput = {
+    doc_type: string
+    document_number: string
+    status: string
+    third_party_id?: number | null
+    date: Date | string
+    notes?: string | null
+    created_by: number
+    approved_by?: number | null
+    attachment_url?: string | null
+    warehouse_from?: WarehouseCreateNestedOneWithoutDocs_fromInput
+    warehouse_to?: WarehouseCreateNestedOneWithoutDocs_toInput
+    lines?: InventoryDocumentLineCreateNestedManyWithoutDocumentInput
+  }
+
+  export type InventoryDocumentUncheckedCreateWithoutSellerInput = {
+    id?: number
+    doc_type: string
+    document_number: string
+    status: string
+    warehouse_from_id?: number | null
+    warehouse_to_id?: number | null
+    third_party_id?: number | null
+    date: Date | string
+    notes?: string | null
+    created_by: number
+    approved_by?: number | null
+    attachment_url?: string | null
+    lines?: InventoryDocumentLineUncheckedCreateNestedManyWithoutDocumentInput
+  }
+
+  export type InventoryDocumentCreateOrConnectWithoutSellerInput = {
+    where: InventoryDocumentWhereUniqueInput
+    create: XOR<InventoryDocumentCreateWithoutSellerInput, InventoryDocumentUncheckedCreateWithoutSellerInput>
+  }
+
+  export type InventoryDocumentCreateManySellerInputEnvelope = {
+    data: InventoryDocumentCreateManySellerInput | InventoryDocumentCreateManySellerInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type WarehouseUpsertWithoutSellersInput = {
+    update: XOR<WarehouseUpdateWithoutSellersInput, WarehouseUncheckedUpdateWithoutSellersInput>
+    create: XOR<WarehouseCreateWithoutSellersInput, WarehouseUncheckedCreateWithoutSellersInput>
+    where?: WarehouseWhereInput
+  }
+
+  export type WarehouseUpdateToOneWithWhereWithoutSellersInput = {
+    where?: WarehouseWhereInput
+    data: XOR<WarehouseUpdateWithoutSellersInput, WarehouseUncheckedUpdateWithoutSellersInput>
+  }
+
+  export type WarehouseUpdateWithoutSellersInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    manager_id?: NullableIntFieldUpdateOperationsInput | number | null
+    type?: StringFieldUpdateOperationsInput | string
+    active?: BoolFieldUpdateOperationsInput | boolean
+    color?: StringFieldUpdateOperationsInput | string
+    balances?: InventoryBalanceUpdateManyWithoutWarehouseNestedInput
+    docs_from?: InventoryDocumentUpdateManyWithoutWarehouse_fromNestedInput
+    docs_to?: InventoryDocumentUpdateManyWithoutWarehouse_toNestedInput
+  }
+
+  export type WarehouseUncheckedUpdateWithoutSellersInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    manager_id?: NullableIntFieldUpdateOperationsInput | number | null
+    type?: StringFieldUpdateOperationsInput | string
+    active?: BoolFieldUpdateOperationsInput | boolean
+    color?: StringFieldUpdateOperationsInput | string
+    balances?: InventoryBalanceUncheckedUpdateManyWithoutWarehouseNestedInput
+    docs_from?: InventoryDocumentUncheckedUpdateManyWithoutWarehouse_fromNestedInput
+    docs_to?: InventoryDocumentUncheckedUpdateManyWithoutWarehouse_toNestedInput
+  }
+
+  export type InventoryDocumentUpsertWithWhereUniqueWithoutSellerInput = {
+    where: InventoryDocumentWhereUniqueInput
+    update: XOR<InventoryDocumentUpdateWithoutSellerInput, InventoryDocumentUncheckedUpdateWithoutSellerInput>
+    create: XOR<InventoryDocumentCreateWithoutSellerInput, InventoryDocumentUncheckedCreateWithoutSellerInput>
+  }
+
+  export type InventoryDocumentUpdateWithWhereUniqueWithoutSellerInput = {
+    where: InventoryDocumentWhereUniqueInput
+    data: XOR<InventoryDocumentUpdateWithoutSellerInput, InventoryDocumentUncheckedUpdateWithoutSellerInput>
+  }
+
+  export type InventoryDocumentUpdateManyWithWhereWithoutSellerInput = {
+    where: InventoryDocumentScalarWhereInput
+    data: XOR<InventoryDocumentUpdateManyMutationInput, InventoryDocumentUncheckedUpdateManyWithoutSellerInput>
   }
 
   export type InventoryBalanceCreateManyProductInput = {
@@ -13927,6 +15771,7 @@ export namespace Prisma {
     status: string
     warehouse_to_id?: number | null
     third_party_id?: number | null
+    seller_id?: number | null
     date: Date | string
     notes?: string | null
     created_by: number
@@ -13941,11 +15786,20 @@ export namespace Prisma {
     status: string
     warehouse_from_id?: number | null
     third_party_id?: number | null
+    seller_id?: number | null
     date: Date | string
     notes?: string | null
     created_by: number
     approved_by?: number | null
     attachment_url?: string | null
+  }
+
+  export type SellerCreateManyWarehouseInput = {
+    id?: number
+    name: string
+    code: string
+    active?: boolean
+    created_at?: Date | string
   }
 
   export type InventoryBalanceUpdateWithoutWarehouseInput = {
@@ -13988,6 +15842,7 @@ export namespace Prisma {
     approved_by?: NullableIntFieldUpdateOperationsInput | number | null
     attachment_url?: NullableStringFieldUpdateOperationsInput | string | null
     warehouse_to?: WarehouseUpdateOneWithoutDocs_toNestedInput
+    seller?: SellerUpdateOneWithoutDocumentsNestedInput
     lines?: InventoryDocumentLineUpdateManyWithoutDocumentNestedInput
   }
 
@@ -13998,6 +15853,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     warehouse_to_id?: NullableIntFieldUpdateOperationsInput | number | null
     third_party_id?: NullableIntFieldUpdateOperationsInput | number | null
+    seller_id?: NullableIntFieldUpdateOperationsInput | number | null
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     created_by?: IntFieldUpdateOperationsInput | number
@@ -14013,6 +15869,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     warehouse_to_id?: NullableIntFieldUpdateOperationsInput | number | null
     third_party_id?: NullableIntFieldUpdateOperationsInput | number | null
+    seller_id?: NullableIntFieldUpdateOperationsInput | number | null
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     created_by?: IntFieldUpdateOperationsInput | number
@@ -14031,6 +15888,7 @@ export namespace Prisma {
     approved_by?: NullableIntFieldUpdateOperationsInput | number | null
     attachment_url?: NullableStringFieldUpdateOperationsInput | string | null
     warehouse_from?: WarehouseUpdateOneWithoutDocs_fromNestedInput
+    seller?: SellerUpdateOneWithoutDocumentsNestedInput
     lines?: InventoryDocumentLineUpdateManyWithoutDocumentNestedInput
   }
 
@@ -14041,6 +15899,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     warehouse_from_id?: NullableIntFieldUpdateOperationsInput | number | null
     third_party_id?: NullableIntFieldUpdateOperationsInput | number | null
+    seller_id?: NullableIntFieldUpdateOperationsInput | number | null
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     created_by?: IntFieldUpdateOperationsInput | number
@@ -14056,11 +15915,37 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     warehouse_from_id?: NullableIntFieldUpdateOperationsInput | number | null
     third_party_id?: NullableIntFieldUpdateOperationsInput | number | null
+    seller_id?: NullableIntFieldUpdateOperationsInput | number | null
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     created_by?: IntFieldUpdateOperationsInput | number
     approved_by?: NullableIntFieldUpdateOperationsInput | number | null
     attachment_url?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type SellerUpdateWithoutWarehouseInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    active?: BoolFieldUpdateOperationsInput | boolean
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    documents?: InventoryDocumentUpdateManyWithoutSellerNestedInput
+  }
+
+  export type SellerUncheckedUpdateWithoutWarehouseInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    active?: BoolFieldUpdateOperationsInput | boolean
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    documents?: InventoryDocumentUncheckedUpdateManyWithoutSellerNestedInput
+  }
+
+  export type SellerUncheckedUpdateManyWithoutWarehouseInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    active?: BoolFieldUpdateOperationsInput | boolean
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type InventoryDocumentLineCreateManyDocumentInput = {
@@ -14106,6 +15991,67 @@ export namespace Prisma {
     lot?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
+  export type InventoryDocumentCreateManySellerInput = {
+    id?: number
+    doc_type: string
+    document_number: string
+    status: string
+    warehouse_from_id?: number | null
+    warehouse_to_id?: number | null
+    third_party_id?: number | null
+    date: Date | string
+    notes?: string | null
+    created_by: number
+    approved_by?: number | null
+    attachment_url?: string | null
+  }
+
+  export type InventoryDocumentUpdateWithoutSellerInput = {
+    doc_type?: StringFieldUpdateOperationsInput | string
+    document_number?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    third_party_id?: NullableIntFieldUpdateOperationsInput | number | null
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    created_by?: IntFieldUpdateOperationsInput | number
+    approved_by?: NullableIntFieldUpdateOperationsInput | number | null
+    attachment_url?: NullableStringFieldUpdateOperationsInput | string | null
+    warehouse_from?: WarehouseUpdateOneWithoutDocs_fromNestedInput
+    warehouse_to?: WarehouseUpdateOneWithoutDocs_toNestedInput
+    lines?: InventoryDocumentLineUpdateManyWithoutDocumentNestedInput
+  }
+
+  export type InventoryDocumentUncheckedUpdateWithoutSellerInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    doc_type?: StringFieldUpdateOperationsInput | string
+    document_number?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    warehouse_from_id?: NullableIntFieldUpdateOperationsInput | number | null
+    warehouse_to_id?: NullableIntFieldUpdateOperationsInput | number | null
+    third_party_id?: NullableIntFieldUpdateOperationsInput | number | null
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    created_by?: IntFieldUpdateOperationsInput | number
+    approved_by?: NullableIntFieldUpdateOperationsInput | number | null
+    attachment_url?: NullableStringFieldUpdateOperationsInput | string | null
+    lines?: InventoryDocumentLineUncheckedUpdateManyWithoutDocumentNestedInput
+  }
+
+  export type InventoryDocumentUncheckedUpdateManyWithoutSellerInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    doc_type?: StringFieldUpdateOperationsInput | string
+    document_number?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    warehouse_from_id?: NullableIntFieldUpdateOperationsInput | number | null
+    warehouse_to_id?: NullableIntFieldUpdateOperationsInput | number | null
+    third_party_id?: NullableIntFieldUpdateOperationsInput | number | null
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    created_by?: IntFieldUpdateOperationsInput | number
+    approved_by?: NullableIntFieldUpdateOperationsInput | number | null
+    attachment_url?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
 
 
   /**
@@ -14123,6 +16069,10 @@ export namespace Prisma {
      * @deprecated Use InventoryDocumentCountOutputTypeDefaultArgs instead
      */
     export type InventoryDocumentCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = InventoryDocumentCountOutputTypeDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use SellerCountOutputTypeDefaultArgs instead
+     */
+    export type SellerCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = SellerCountOutputTypeDefaultArgs<ExtArgs>
     /**
      * @deprecated Use UserDefaultArgs instead
      */
@@ -14155,6 +16105,10 @@ export namespace Prisma {
      * @deprecated Use AuditLogDefaultArgs instead
      */
     export type AuditLogArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = AuditLogDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use SellerDefaultArgs instead
+     */
+    export type SellerArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = SellerDefaultArgs<ExtArgs>
 
   /**
    * Batch Payload for updateMany & deleteMany & createMany

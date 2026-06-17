@@ -7,6 +7,8 @@ import { PrismaClient } from './generated/client';
 import productRoutes from './routes/products.routes';
 import warehouseRoutes from './routes/warehouses.routes';
 import documentRoutes from './routes/documents.routes';
+import sellerRoutes from './routes/sellers.routes';
+import adminRoutes from './routes/admin.routes';
 
 import path from 'path';
 
@@ -27,6 +29,8 @@ app.get('/api/health', (req, res) => {
 app.use('/api/products', productRoutes);
 app.use('/api/warehouses', warehouseRoutes);
 app.use('/api/documents', documentRoutes);
+app.use('/api/sellers', sellerRoutes);
+app.use('/api/admin', adminRoutes);
 
 const PORT = process.env.PORT || 3000;
 

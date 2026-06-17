@@ -40,9 +40,10 @@ router.get('/', async (req, res) => {
   try {
     const documents = await prisma.inventoryDocument.findMany({
       include: {
+        seller: true,
         lines: {
           include: {
-            // product: true // Not in schema lines relation yet, but good to have
+            product: true
           }
         }
       },
@@ -96,6 +97,7 @@ router.get('/report/outputs', async (req, res) => {
       },
       include: {
         warehouse_from: true,
+        seller: true,
         lines: {
           include: {
             product: true

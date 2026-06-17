@@ -116,6 +116,9 @@ Prisma.NullTypes = {
  */
 
 exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
+  ReadUncommitted: 'ReadUncommitted',
+  ReadCommitted: 'ReadCommitted',
+  RepeatableRead: 'RepeatableRead',
   Serializable: 'Serializable'
 });
 
@@ -171,6 +174,7 @@ exports.Prisma.InventoryDocumentScalarFieldEnum = {
   warehouse_from_id: 'warehouse_from_id',
   warehouse_to_id: 'warehouse_to_id',
   third_party_id: 'third_party_id',
+  seller_id: 'seller_id',
   date: 'date',
   notes: 'notes',
   created_by: 'created_by',
@@ -219,9 +223,23 @@ exports.Prisma.AuditLogScalarFieldEnum = {
   ip: 'ip'
 };
 
+exports.Prisma.SellerScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  code: 'code',
+  warehouse_id: 'warehouse_id',
+  active: 'active',
+  created_at: 'created_at'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
+};
+
+exports.Prisma.QueryMode = {
+  default: 'default',
+  insensitive: 'insensitive'
 };
 
 exports.Prisma.NullsOrder = {
@@ -238,7 +256,8 @@ exports.Prisma.ModelName = {
   InventoryDocument: 'InventoryDocument',
   InventoryDocumentLine: 'InventoryDocumentLine',
   InventoryLedger: 'InventoryLedger',
-  AuditLog: 'AuditLog'
+  AuditLog: 'AuditLog',
+  Seller: 'Seller'
 };
 
 /**

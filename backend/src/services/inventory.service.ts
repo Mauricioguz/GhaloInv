@@ -22,6 +22,7 @@ export class InventoryService {
           warehouse_from_id: docData.warehouse_from_id ? Number(docData.warehouse_from_id) : null,
           warehouse_to_id: docData.warehouse_to_id ? Number(docData.warehouse_to_id) : null,
           third_party_id: docData.third_party_id ? Number(docData.third_party_id) : null,
+          seller_id: docData.seller_id ? Number(docData.seller_id) : null,
           date: new Date(docData.date),
           notes: docData.notes,
           attachment_url: docData.attachment_url,
