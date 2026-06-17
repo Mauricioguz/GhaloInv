@@ -12,6 +12,7 @@ const Sidebar = ({ activeTab, setActiveTab, onResetClick }: { activeTab: string,
       <a href="#" className={`nav-item ${activeTab === 'sellers' ? 'active' : ''}`} onClick={() => setActiveTab('sellers')}>👤 Vendedores</a>
       <a href="#" className={`nav-item ${activeTab === 'transactions' ? 'active' : ''}`} onClick={() => setActiveTab('transactions')}>🔄 Transacciones</a>
       <a href="#" className={`nav-item ${activeTab === 'reports' ? 'active' : ''}`} onClick={() => setActiveTab('reports')}>📑 Reportes</a>
+      <a href="#" className={`nav-item ${activeTab === 'bi' ? 'active' : ''}`} onClick={() => setActiveTab('bi')}>📈 Inteligencia BI</a>
     </nav>
     <div className="sidebar-footer" style={{ marginTop: 'auto', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
       <button className="btn btn-outline" style={{ width: '100%', borderColor: 'var(--danger)', color: 'var(--danger)', padding: '8px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }} onClick={onResetClick}>
@@ -1189,6 +1190,384 @@ const SystemResetModal = ({ onClose, onResetComplete }: any) => {
     );
 };
 
+const BIDashboard = ({ products, warehouses, sellers }: any) => {
+    const [docs, setDocs] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [dateRange, setDateRange] = useState('30days'); // 7days, 30days, thismonth, all
+    const [selectedWh, setSelectedWh] = useState('');
+    const [selectedSeller, setSelectedSeller] = useState('');
+
+    const fetchDocs = async () => {
+        setLoading(true);
+        try {
+            const res = await fetch(`${API_URL}/documents`);
+            if (res.ok) setDocs(await res.json());
+        } catch (e) { console.error(e); }
+        setLoading(false);
+    };
+
+    useEffect(() => {
+        fetchDocs();
+    }, []);
+
+    const filteredDocs = useMemo(() => {
+        return docs.filter(doc => {
+            if (doc.status !== 'APPLIED') return false;
+
+            // 1. Date filter
+            const docDate = new Date(doc.date);
+            const now = new Date();
+            if (dateRange === '7days') {
+                const diffTime = Math.abs(now.getTime() - docDate.getTime());
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                if (diffDays > 7) return false;
+            } else if (dateRange === '30days') {
+                const diffTime = Math.abs(now.getTime() - docDate.getTime());
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                if (diffDays > 30) return false;
+            } else if (dateRange === 'thismonth') {
+                if (docDate.getMonth() !== now.getMonth() || docDate.getFullYear() !== now.getFullYear()) return false;
+            }
+
+            // 2. Warehouse filter
+            if (selectedWh) {
+                const whId = parseInt(selectedWh);
+                if (doc.doc_type === 'OUT' && doc.warehouse_from_id !== whId) return false;
+                if (doc.doc_type === 'IN' && doc.warehouse_to_id !== whId) return false;
+                if (doc.doc_type !== 'OUT' && doc.doc_type !== 'IN' && doc.warehouse_from_id !== whId && doc.warehouse_to_id !== whId) return false;
+            }
+
+            // 3. Seller filter
+            if (selectedSeller) {
+                const sellerId = parseInt(selectedSeller);
+                if (doc.seller_id !== sellerId) return false;
+            }
+
+            return true;
+        });
+    }, [docs, dateRange, selectedWh, selectedSeller]);
+
+    const kpis = useMemo(() => {
+        let totalSales = 0;
+        let totalCostOfSales = 0;
+        let totalMermas = 0; // Negative adjustments
+
+        filteredDocs.forEach(doc => {
+            if (doc.doc_type === 'OUT') {
+                doc.lines.forEach((l: any) => {
+                    totalSales += l.total_sale || 0;
+                    totalCostOfSales += l.total_cost || 0;
+                });
+            } else if (doc.doc_type === 'AJ') {
+                doc.lines.forEach((l: any) => {
+                    if (l.qty < 0) {
+                        totalMermas += Math.abs(l.total_cost || (l.qty * (l.unit_cost || 0)));
+                    }
+                });
+            }
+        });
+
+        const utility = totalSales - totalCostOfSales;
+        const margin = totalSales > 0 ? (utility / totalSales) * 100 : 0;
+
+        return {
+            sales: totalSales,
+            cogs: totalCostOfSales,
+            utility,
+            margin,
+            mermas: totalMermas
+        };
+    }, [filteredDocs]);
+
+    const productPerformance = useMemo(() => {
+        const prodMap: { [key: number]: { id: number, name: string, sku: string, qty: number, sale: number, cost: number } } = {};
+
+        filteredDocs.filter(d => d.doc_type === 'OUT').forEach(doc => {
+            doc.lines.forEach((l: any) => {
+                const pId = l.product_id;
+                if (!prodMap[pId]) {
+                    const prod = products.find((p: any) => p.id === pId);
+                    prodMap[pId] = {
+                        id: pId,
+                        name: prod?.name || 'Producto Desconocido',
+                        sku: prod?.sku || 'N/A',
+                        qty: 0,
+                        sale: 0,
+                        cost: 0
+                    };
+                }
+                prodMap[pId].qty += l.qty;
+                prodMap[pId].sale += l.total_sale || 0;
+                prodMap[pId].cost += l.total_cost || 0;
+            });
+        });
+
+        return Object.values(prodMap)
+            .map(p => {
+                const utility = p.sale - p.cost;
+                const margin = p.sale > 0 ? (utility / p.sale) * 100 : 0;
+                return { ...p, utility, margin };
+            })
+            .sort((a, b) => b.utility - a.utility);
+    }, [filteredDocs, products]);
+
+    const warehousePerformance = useMemo(() => {
+        const whMap: { [key: number]: { id: number, name: string, color: string, sale: number, cost: number, mermas: number } } = {};
+
+        warehouses.filter((w: any) => w.active).forEach((w: any) => {
+            whMap[w.id] = { id: w.id, name: w.name, color: w.color, sale: 0, cost: 0, mermas: 0 };
+        });
+
+        filteredDocs.forEach(doc => {
+            if (doc.doc_type === 'OUT' && doc.warehouse_from_id && whMap[doc.warehouse_from_id]) {
+                doc.lines.forEach((l: any) => {
+                    whMap[doc.warehouse_from_id!].sale += l.total_sale || 0;
+                    whMap[doc.warehouse_from_id!].cost += l.total_cost || 0;
+                });
+            } else if (doc.doc_type === 'AJ') {
+                doc.lines.forEach((l: any) => {
+                    if (l.qty < 0) {
+                        const whId = doc.warehouse_from_id || doc.warehouse_to_id;
+                        if (whId && whMap[whId]) {
+                            whMap[whId].mermas += Math.abs(l.total_cost || (l.qty * (l.unit_cost || 0)));
+                        }
+                    }
+                });
+            }
+        });
+
+        return Object.values(whMap)
+            .map(w => {
+                const utility = w.sale - w.cost;
+                const margin = w.sale > 0 ? (utility / w.sale) * 100 : 0;
+                return { ...w, utility, margin };
+            })
+            .sort((a, b) => b.sale - a.sale);
+    }, [filteredDocs, warehouses]);
+
+    const dailyTrend = useMemo(() => {
+        const trendMap: { [key: string]: { date: string, label: string, sale: number, cost: number } } = {};
+        
+        let daysCount = 30;
+        if (dateRange === '7days') daysCount = 7;
+        else if (dateRange === 'thismonth') {
+            const now = new Date();
+            daysCount = now.getDate();
+        }
+
+        const datesList: string[] = [];
+        for (let i = daysCount - 1; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            const dateStr = d.toISOString().split('T')[0];
+            datesList.push(dateStr);
+            
+            trendMap[dateStr] = {
+                date: dateStr,
+                label: `${d.getDate()}/${d.getMonth()+1}`,
+                sale: 0,
+                cost: 0
+            };
+        }
+
+        filteredDocs.filter(d => d.doc_type === 'OUT').forEach(doc => {
+            const dateStr = doc.date.split('T')[0];
+            if (trendMap[dateStr]) {
+                doc.lines.forEach((l: any) => {
+                    trendMap[dateStr].sale += l.total_sale || 0;
+                    trendMap[dateStr].cost += l.total_cost || 0;
+                });
+            }
+        });
+
+        return datesList.map(date => trendMap[date]);
+    }, [filteredDocs, dateRange]);
+
+    const maxTrendValue = useMemo(() => {
+        return Math.max(...dailyTrend.map(d => Math.max(d.sale, d.cost)), 1);
+    }, [dailyTrend]);
+
+    return (
+        <div className="view">
+            <div className="header" style={{ marginBottom: '1.5rem' }}>
+                <div>
+                    <h1 style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>📈 Inteligencia de Negocio (BI)</h1>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: '4px 0 0 0' }}>Análisis avanzado de ventas, costos, rentabilidad y pérdidas de inventario.</p>
+                </div>
+                <button className="btn btn-outline" onClick={fetchDocs} disabled={loading} style={{ fontSize: '0.8rem' }}>
+                    {loading ? 'Cargando...' : '🔄 Sincronizar'}
+                </button>
+            </div>
+
+            {/* Filters Row */}
+            <div className="glass-card" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '1.5rem', padding: '1.2rem' }}>
+                <div>
+                    <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Rango de Tiempo:</label>
+                    <select value={dateRange} onChange={e => setDateRange(e.target.value)} style={{ width: '100%', marginBottom: 0 }}>
+                        <option value="7days">Últimos 7 Días</option>
+                        <option value="30days">Últimos 30 Días</option>
+                        <option value="thismonth">Este Mes</option>
+                        <option value="all">Todo el Historial</option>
+                    </select>
+                </div>
+                <div>
+                    <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Bodega / Tienda:</label>
+                    <select value={selectedWh} onChange={e => { setSelectedWh(e.target.value); setSelectedSeller(''); }} style={{ width: '100%', marginBottom: 0 }}>
+                        <option value="">Todas las Bodegas</option>
+                        {warehouses.filter((w: any) => w.active).map((w: any) => (
+                            <option key={w.id} value={w.id}>{w.name}</option>
+                        ))}
+                    </select>
+                </div>
+                <div>
+                    <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Vendedor:</label>
+                    <select value={selectedSeller} onChange={e => setSelectedSeller(e.target.value)} style={{ width: '100%', marginBottom: 0 }}>
+                        <option value="">Todos los Vendedores</option>
+                        {sellers.filter((s: any) => s.active && (!selectedWh || Number(s.warehouse_id) === Number(selectedWh))).map((s: any) => (
+                            <option key={s.id} value={s.id}>{s.name} [{s.code}]</option>
+                        ))}
+                    </select>
+                </div>
+            </div>
+
+            {/* KPI Cards Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '1rem', marginBottom: '2rem' }}>
+                <div className="glass-card stat-card" style={{ borderBottom: '4px solid var(--success)', padding: '1rem 1.2rem', gap: '0.3rem' }}>
+                    <span className="stat-label" style={{ fontSize: '0.75rem' }}>Ventas Totales</span>
+                    <span className="stat-value" style={{ fontSize: '1.3rem', color: 'var(--success)' }}>
+                        {new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(kpis.sales)}
+                    </span>
+                </div>
+                <div className="glass-card stat-card" style={{ borderBottom: '4px solid rgba(255,255,255,0.4)', padding: '1rem 1.2rem', gap: '0.3rem' }}>
+                    <span className="stat-label" style={{ fontSize: '0.75rem' }}>Costo de Ventas (COGS)</span>
+                    <span className="stat-value" style={{ fontSize: '1.3rem' }}>
+                        {new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(kpis.cogs)}
+                    </span>
+                </div>
+                <div className="glass-card stat-card" style={{ borderBottom: '4px solid var(--primary)', padding: '1rem 1.2rem', gap: '0.3rem' }}>
+                    <span className="stat-label" style={{ fontSize: '0.75rem' }}>Utilidad Operativa</span>
+                    <span className="stat-value" style={{ fontSize: '1.3rem', color: 'var(--primary)' }}>
+                        {new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(kpis.utility)}
+                    </span>
+                </div>
+                <div className="glass-card stat-card" style={{ borderBottom: '4px solid var(--info)', padding: '1rem 1.2rem', gap: '0.3rem' }}>
+                    <span className="stat-label" style={{ fontSize: '0.75rem' }}>Margen Comercial</span>
+                    <span className="stat-value" style={{ fontSize: '1.3rem', color: 'var(--info)' }}>
+                        {kpis.margin.toFixed(1)}%
+                    </span>
+                </div>
+                <div className="glass-card stat-card" style={{ borderBottom: '4px solid var(--danger)', padding: '1rem 1.2rem', gap: '0.3rem' }}>
+                    <span className="stat-label" style={{ fontSize: '0.75rem' }}>Mermas / Ajustes (-)</span>
+                    <span className="stat-value" style={{ fontSize: '1.3rem', color: 'var(--danger)' }}>
+                        {new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(kpis.mermas)}
+                    </span>
+                </div>
+            </div>
+
+            {/* Daily evolution chart */}
+            <div className="glass-card" style={{ marginBottom: '2rem' }}>
+                <h3 style={{ marginBottom: '1rem', color: 'var(--primary)' }}>📈 Historial Diario: Ingresos (Verde) vs Costos (Gris)</h3>
+                <div style={{ height: '160px', display: 'flex', alignItems: 'flex-end', gap: '6px', padding: '15px 0 5px 0', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                    {dailyTrend.map((d, idx) => (
+                        <div key={idx} style={{ flex: 1, display: 'flex', gap: '2px', alignItems: 'flex-end', height: '100%', position: 'relative' }} title={`Fecha: ${d.date}\nVentas: ${new Intl.NumberFormat('es-CO').format(d.sale)}\nCostos: ${new Intl.NumberFormat('es-CO').format(d.cost)}`}>
+                            <div style={{ flex: 1, height: `${(d.cost / maxTrendValue) * 100}%`, background: 'rgba(255,255,255,0.12)', borderRadius: '2px 2px 0 0' }} />
+                            <div style={{ flex: 1, height: `${(d.sale / maxTrendValue) * 100}%`, background: 'var(--success)', borderRadius: '2px 2px 0 0', boxShadow: d.sale > 0 ? '0 0 10px rgba(16, 185, 129, 0.2)' : 'none' }} />
+                        </div>
+                    ))}
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '8px' }}>
+                    <span>{dailyTrend[0]?.label}</span>
+                    <span>Evolución diaria del periodo</span>
+                    <span>{dailyTrend[dailyTrend.length-1]?.label}</span>
+                </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr', gap: '1.5rem' }}>
+                {/* Product profitability ranking */}
+                <div className="glass-card" style={{ padding: '1.5rem 1.2rem' }}>
+                    <h3 style={{ color: 'var(--primary)', marginBottom: '1rem' }}>📦 Rentabilidad por Producto (Pareto)</h3>
+                    <div style={{ overflowX: 'auto' }}>
+                        <table style={{ width: '100%', fontSize: '0.85rem' }}>
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th style={{ textAlign: 'center' }}>Cant.</th>
+                                    <th style={{ textAlign: 'right' }}>Ingreso (Ventas)</th>
+                                    <th style={{ textAlign: 'right' }}>Utilidad</th>
+                                    <th style={{ textAlign: 'center' }}>Margen</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {productPerformance.map(p => (
+                                    <tr key={p.id}>
+                                        <td>
+                                            <div style={{ fontWeight: 600 }}>{p.name}</div>
+                                            <small style={{ opacity: 0.6 }}>{p.sku}</small>
+                                        </td>
+                                        <td style={{ textAlign: 'center', fontWeight: 600 }}>{p.qty} ud</td>
+                                        <td style={{ textAlign: 'right' }}>
+                                            {new Intl.NumberFormat('es-CO').format(p.sale)}
+                                        </td>
+                                        <td style={{ textAlign: 'right', fontWeight: 600, color: 'var(--success)' }}>
+                                            {new Intl.NumberFormat('es-CO').format(p.utility)}
+                                        </td>
+                                        <td style={{ textAlign: 'center' }}>
+                                            <span className="badge badge-in" style={{ fontSize: '0.75rem', padding: '2px 6px' }}>{p.margin.toFixed(1)}%</span>
+                                        </td>
+                                    </tr>
+                                ))}
+                                {productPerformance.length === 0 && (
+                                    <tr>
+                                        <td colSpan={5} style={{ textAlign: 'center', opacity: 0.5, padding: '2rem' }}>Sin datos de ventas en el periodo.</td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {/* Warehouse breakdown and mermas */}
+                <div className="glass-card" style={{ padding: '1.5rem 1.2rem' }}>
+                    <h3 style={{ color: 'var(--primary)', marginBottom: '1rem' }}>🏠 Rendimiento y Pérdidas por Bodega</h3>
+                    <div style={{ overflowX: 'auto' }}>
+                        <table style={{ width: '100%', fontSize: '0.85rem' }}>
+                            <thead>
+                                <tr>
+                                    <th>Bodega</th>
+                                    <th style={{ textAlign: 'right' }}>Vendido</th>
+                                    <th style={{ textAlign: 'right' }}>Utilidad</th>
+                                    <th style={{ textAlign: 'right', color: 'var(--danger)' }}>Mermas</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {warehousePerformance.map(w => (
+                                    <tr key={w.id}>
+                                        <td style={{ fontWeight: 600 }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: w.color }} />
+                                                {w.name}
+                                            </div>
+                                        </td>
+                                        <td style={{ textAlign: 'right' }}>
+                                            {new Intl.NumberFormat('es-CO').format(w.sale)}
+                                        </td>
+                                        <td style={{ textAlign: 'right', fontWeight: 600, color: w.utility >= 0 ? 'var(--success)' : 'inherit' }}>
+                                            {new Intl.NumberFormat('es-CO').format(w.utility)}
+                                        </td>
+                                        <td style={{ textAlign: 'right', fontWeight: 600, color: 'var(--danger)' }}>
+                                            {w.mermas > 0 ? `-${new Intl.NumberFormat('es-CO').format(w.mermas)}` : '$0'}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [products, setProducts] = useState([]);
@@ -1221,6 +1600,7 @@ export default function App() {
         {activeTab === 'warehouses' && <WarehouseManager warehouses={warehouses} onRefresh={fetchData} />}
         {activeTab === 'sellers' && <SellerManager sellers={sellers} warehouses={warehouses} onRefresh={fetchData} />}
         {activeTab === 'reports' && <SalesReport sellers={sellers} onProductClick={setSelId} />}
+        {activeTab === 'bi' && <BIDashboard products={products} warehouses={warehouses} sellers={sellers} />}
       </main>
       {selId && <ProductDetailModal productId={selId} onClose={() => setSelId(null)} />}
       {selWhId && <WarehouseInventoryModal warehouseId={selWhId} warehouses={warehouses} products={products} onClose={() => setSelWhId(null)} onProductClick={setSelId} />}
