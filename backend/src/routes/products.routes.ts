@@ -60,8 +60,28 @@ router.get('/:id', async (req, res) => {
       }
     });
     if (!product) return res.status(404).json({ error: 'Product not found' });
-    res.json(product);
+
+    // Cargar detalles de bodega y documento para cada registro del ledger de manera segura
+    const ledgerWithDetails = await Promise.all(product.ledger.map(async (l) => {
+      const warehouse = await prisma.warehouse.findUnique({
+        where: { id: l.warehouse_id }
+      });
+      const document = await prisma.inventoryDocument.findUnique({
+        where: { id: l.doc_id }
+      });
+      return {
+        ...l,
+        warehouse,
+        document
+      };
+    }));
+
+    res.json({
+      ...product,
+      ledger: ledgerWithDetails
+    });
   } catch (error) {
+    console.error('Error fetching product:', error);
     res.status(500).json({ error: 'Error fetching product' });
   }
 });

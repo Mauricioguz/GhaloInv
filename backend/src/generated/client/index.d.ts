@@ -58,6 +58,11 @@ export type AuditLog = $Result.DefaultSelection<Prisma.$AuditLogPayload>
  * 
  */
 export type Seller = $Result.DefaultSelection<Prisma.$SellerPayload>
+/**
+ * Model CommissionPayout
+ * 
+ */
+export type CommissionPayout = $Result.DefaultSelection<Prisma.$CommissionPayoutPayload>
 
 /**
  * ##  Prisma Client ʲˢ
@@ -271,6 +276,16 @@ export class PrismaClient<
     * ```
     */
   get seller(): Prisma.SellerDelegate<ExtArgs>;
+
+  /**
+   * `prisma.commissionPayout`: Exposes CRUD operations for the **CommissionPayout** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more CommissionPayouts
+    * const commissionPayouts = await prisma.commissionPayout.findMany()
+    * ```
+    */
+  get commissionPayout(): Prisma.CommissionPayoutDelegate<ExtArgs>;
 }
 
 export namespace Prisma {
@@ -720,7 +735,8 @@ export namespace Prisma {
     InventoryDocumentLine: 'InventoryDocumentLine',
     InventoryLedger: 'InventoryLedger',
     AuditLog: 'AuditLog',
-    Seller: 'Seller'
+    Seller: 'Seller',
+    CommissionPayout: 'CommissionPayout'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -736,7 +752,7 @@ export namespace Prisma {
 
   export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> = {
     meta: {
-      modelProps: "user" | "product" | "warehouse" | "inventoryBalance" | "inventoryDocument" | "inventoryDocumentLine" | "inventoryLedger" | "auditLog" | "seller"
+      modelProps: "user" | "product" | "warehouse" | "inventoryBalance" | "inventoryDocument" | "inventoryDocumentLine" | "inventoryLedger" | "auditLog" | "seller" | "commissionPayout"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1370,6 +1386,76 @@ export namespace Prisma {
           }
         }
       }
+      CommissionPayout: {
+        payload: Prisma.$CommissionPayoutPayload<ExtArgs>
+        fields: Prisma.CommissionPayoutFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.CommissionPayoutFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CommissionPayoutPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.CommissionPayoutFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CommissionPayoutPayload>
+          }
+          findFirst: {
+            args: Prisma.CommissionPayoutFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CommissionPayoutPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.CommissionPayoutFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CommissionPayoutPayload>
+          }
+          findMany: {
+            args: Prisma.CommissionPayoutFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CommissionPayoutPayload>[]
+          }
+          create: {
+            args: Prisma.CommissionPayoutCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CommissionPayoutPayload>
+          }
+          createMany: {
+            args: Prisma.CommissionPayoutCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.CommissionPayoutCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CommissionPayoutPayload>[]
+          }
+          delete: {
+            args: Prisma.CommissionPayoutDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CommissionPayoutPayload>
+          }
+          update: {
+            args: Prisma.CommissionPayoutUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CommissionPayoutPayload>
+          }
+          deleteMany: {
+            args: Prisma.CommissionPayoutDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.CommissionPayoutUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.CommissionPayoutUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CommissionPayoutPayload>
+          }
+          aggregate: {
+            args: Prisma.CommissionPayoutAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateCommissionPayout>
+          }
+          groupBy: {
+            args: Prisma.CommissionPayoutGroupByArgs<ExtArgs>
+            result: $Utils.Optional<CommissionPayoutGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.CommissionPayoutCountArgs<ExtArgs>
+            result: $Utils.Optional<CommissionPayoutCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1670,10 +1756,12 @@ export namespace Prisma {
 
   export type SellerCountOutputType = {
     documents: number
+    payouts: number
   }
 
   export type SellerCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     documents?: boolean | SellerCountOutputTypeCountDocumentsArgs
+    payouts?: boolean | SellerCountOutputTypeCountPayoutsArgs
   }
 
   // Custom InputTypes
@@ -1692,6 +1780,13 @@ export namespace Prisma {
    */
   export type SellerCountOutputTypeCountDocumentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: InventoryDocumentWhereInput
+  }
+
+  /**
+   * SellerCountOutputType without action
+   */
+  export type SellerCountOutputTypeCountPayoutsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CommissionPayoutWhereInput
   }
 
 
@@ -2504,7 +2599,6 @@ export namespace Prisma {
      * The data used to create many Users.
      */
     data: UserCreateManyInput | UserCreateManyInput[]
-    skipDuplicates?: boolean
   }
 
   /**
@@ -2519,7 +2613,6 @@ export namespace Prisma {
      * The data used to create many Users.
      */
     data: UserCreateManyInput | UserCreateManyInput[]
-    skipDuplicates?: boolean
   }
 
   /**
@@ -3550,7 +3643,6 @@ export namespace Prisma {
      * The data used to create many Products.
      */
     data: ProductCreateManyInput | ProductCreateManyInput[]
-    skipDuplicates?: boolean
   }
 
   /**
@@ -3565,7 +3657,6 @@ export namespace Prisma {
      * The data used to create many Products.
      */
     data: ProductCreateManyInput | ProductCreateManyInput[]
-    skipDuplicates?: boolean
   }
 
   /**
@@ -4612,7 +4703,6 @@ export namespace Prisma {
      * The data used to create many Warehouses.
      */
     data: WarehouseCreateManyInput | WarehouseCreateManyInput[]
-    skipDuplicates?: boolean
   }
 
   /**
@@ -4627,7 +4717,6 @@ export namespace Prisma {
      * The data used to create many Warehouses.
      */
     data: WarehouseCreateManyInput | WarehouseCreateManyInput[]
-    skipDuplicates?: boolean
   }
 
   /**
@@ -5717,7 +5806,6 @@ export namespace Prisma {
      * The data used to create many InventoryBalances.
      */
     data: InventoryBalanceCreateManyInput | InventoryBalanceCreateManyInput[]
-    skipDuplicates?: boolean
   }
 
   /**
@@ -5732,7 +5820,6 @@ export namespace Prisma {
      * The data used to create many InventoryBalances.
      */
     data: InventoryBalanceCreateManyInput | InventoryBalanceCreateManyInput[]
-    skipDuplicates?: boolean
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -6822,7 +6909,6 @@ export namespace Prisma {
      * The data used to create many InventoryDocuments.
      */
     data: InventoryDocumentCreateManyInput | InventoryDocumentCreateManyInput[]
-    skipDuplicates?: boolean
   }
 
   /**
@@ -6837,7 +6923,6 @@ export namespace Prisma {
      * The data used to create many InventoryDocuments.
      */
     data: InventoryDocumentCreateManyInput | InventoryDocumentCreateManyInput[]
-    skipDuplicates?: boolean
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -7936,7 +8021,6 @@ export namespace Prisma {
      * The data used to create many InventoryDocumentLines.
      */
     data: InventoryDocumentLineCreateManyInput | InventoryDocumentLineCreateManyInput[]
-    skipDuplicates?: boolean
   }
 
   /**
@@ -7951,7 +8035,6 @@ export namespace Prisma {
      * The data used to create many InventoryDocumentLines.
      */
     data: InventoryDocumentLineCreateManyInput | InventoryDocumentLineCreateManyInput[]
-    skipDuplicates?: boolean
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -9051,7 +9134,6 @@ export namespace Prisma {
      * The data used to create many InventoryLedgers.
      */
     data: InventoryLedgerCreateManyInput | InventoryLedgerCreateManyInput[]
-    skipDuplicates?: boolean
   }
 
   /**
@@ -9066,7 +9148,6 @@ export namespace Prisma {
      * The data used to create many InventoryLedgers.
      */
     data: InventoryLedgerCreateManyInput | InventoryLedgerCreateManyInput[]
-    skipDuplicates?: boolean
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -10039,7 +10120,6 @@ export namespace Prisma {
      * The data used to create many AuditLogs.
      */
     data: AuditLogCreateManyInput | AuditLogCreateManyInput[]
-    skipDuplicates?: boolean
   }
 
   /**
@@ -10054,7 +10134,6 @@ export namespace Prisma {
      * The data used to create many AuditLogs.
      */
     data: AuditLogCreateManyInput | AuditLogCreateManyInput[]
-    skipDuplicates?: boolean
   }
 
   /**
@@ -10161,11 +10240,13 @@ export namespace Prisma {
   export type SellerAvgAggregateOutputType = {
     id: number | null
     warehouse_id: number | null
+    commission_pct: number | null
   }
 
   export type SellerSumAggregateOutputType = {
     id: number | null
     warehouse_id: number | null
+    commission_pct: number | null
   }
 
   export type SellerMinAggregateOutputType = {
@@ -10175,6 +10256,7 @@ export namespace Prisma {
     warehouse_id: number | null
     active: boolean | null
     created_at: Date | null
+    commission_pct: number | null
   }
 
   export type SellerMaxAggregateOutputType = {
@@ -10184,6 +10266,7 @@ export namespace Prisma {
     warehouse_id: number | null
     active: boolean | null
     created_at: Date | null
+    commission_pct: number | null
   }
 
   export type SellerCountAggregateOutputType = {
@@ -10193,6 +10276,7 @@ export namespace Prisma {
     warehouse_id: number
     active: number
     created_at: number
+    commission_pct: number
     _all: number
   }
 
@@ -10200,11 +10284,13 @@ export namespace Prisma {
   export type SellerAvgAggregateInputType = {
     id?: true
     warehouse_id?: true
+    commission_pct?: true
   }
 
   export type SellerSumAggregateInputType = {
     id?: true
     warehouse_id?: true
+    commission_pct?: true
   }
 
   export type SellerMinAggregateInputType = {
@@ -10214,6 +10300,7 @@ export namespace Prisma {
     warehouse_id?: true
     active?: true
     created_at?: true
+    commission_pct?: true
   }
 
   export type SellerMaxAggregateInputType = {
@@ -10223,6 +10310,7 @@ export namespace Prisma {
     warehouse_id?: true
     active?: true
     created_at?: true
+    commission_pct?: true
   }
 
   export type SellerCountAggregateInputType = {
@@ -10232,6 +10320,7 @@ export namespace Prisma {
     warehouse_id?: true
     active?: true
     created_at?: true
+    commission_pct?: true
     _all?: true
   }
 
@@ -10328,6 +10417,7 @@ export namespace Prisma {
     warehouse_id: number
     active: boolean
     created_at: Date
+    commission_pct: number
     _count: SellerCountAggregateOutputType | null
     _avg: SellerAvgAggregateOutputType | null
     _sum: SellerSumAggregateOutputType | null
@@ -10356,8 +10446,10 @@ export namespace Prisma {
     warehouse_id?: boolean
     active?: boolean
     created_at?: boolean
+    commission_pct?: boolean
     warehouse?: boolean | WarehouseDefaultArgs<ExtArgs>
     documents?: boolean | Seller$documentsArgs<ExtArgs>
+    payouts?: boolean | Seller$payoutsArgs<ExtArgs>
     _count?: boolean | SellerCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["seller"]>
 
@@ -10368,6 +10460,7 @@ export namespace Prisma {
     warehouse_id?: boolean
     active?: boolean
     created_at?: boolean
+    commission_pct?: boolean
     warehouse?: boolean | WarehouseDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["seller"]>
 
@@ -10378,11 +10471,13 @@ export namespace Prisma {
     warehouse_id?: boolean
     active?: boolean
     created_at?: boolean
+    commission_pct?: boolean
   }
 
   export type SellerInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     warehouse?: boolean | WarehouseDefaultArgs<ExtArgs>
     documents?: boolean | Seller$documentsArgs<ExtArgs>
+    payouts?: boolean | Seller$payoutsArgs<ExtArgs>
     _count?: boolean | SellerCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type SellerIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -10394,6 +10489,7 @@ export namespace Prisma {
     objects: {
       warehouse: Prisma.$WarehousePayload<ExtArgs>
       documents: Prisma.$InventoryDocumentPayload<ExtArgs>[]
+      payouts: Prisma.$CommissionPayoutPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
@@ -10402,6 +10498,7 @@ export namespace Prisma {
       warehouse_id: number
       active: boolean
       created_at: Date
+      commission_pct: number
     }, ExtArgs["result"]["seller"]>
     composites: {}
   }
@@ -10768,6 +10865,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     warehouse<T extends WarehouseDefaultArgs<ExtArgs> = {}>(args?: Subset<T, WarehouseDefaultArgs<ExtArgs>>): Prisma__WarehouseClient<$Result.GetResult<Prisma.$WarehousePayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
     documents<T extends Seller$documentsArgs<ExtArgs> = {}>(args?: Subset<T, Seller$documentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InventoryDocumentPayload<ExtArgs>, T, "findMany"> | Null>
+    payouts<T extends Seller$payoutsArgs<ExtArgs> = {}>(args?: Subset<T, Seller$payoutsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CommissionPayoutPayload<ExtArgs>, T, "findMany"> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -10803,6 +10901,7 @@ export namespace Prisma {
     readonly warehouse_id: FieldRef<"Seller", 'Int'>
     readonly active: FieldRef<"Seller", 'Boolean'>
     readonly created_at: FieldRef<"Seller", 'DateTime'>
+    readonly commission_pct: FieldRef<"Seller", 'Float'>
   }
     
 
@@ -11008,7 +11107,6 @@ export namespace Prisma {
      * The data used to create many Sellers.
      */
     data: SellerCreateManyInput | SellerCreateManyInput[]
-    skipDuplicates?: boolean
   }
 
   /**
@@ -11023,7 +11121,6 @@ export namespace Prisma {
      * The data used to create many Sellers.
      */
     data: SellerCreateManyInput | SellerCreateManyInput[]
-    skipDuplicates?: boolean
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -11141,6 +11238,26 @@ export namespace Prisma {
   }
 
   /**
+   * Seller.payouts
+   */
+  export type Seller$payoutsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CommissionPayout
+     */
+    select?: CommissionPayoutSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CommissionPayoutInclude<ExtArgs> | null
+    where?: CommissionPayoutWhereInput
+    orderBy?: CommissionPayoutOrderByWithRelationInput | CommissionPayoutOrderByWithRelationInput[]
+    cursor?: CommissionPayoutWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: CommissionPayoutScalarFieldEnum | CommissionPayoutScalarFieldEnum[]
+  }
+
+  /**
    * Seller without action
    */
   export type SellerDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -11156,13 +11273,1027 @@ export namespace Prisma {
 
 
   /**
+   * Model CommissionPayout
+   */
+
+  export type AggregateCommissionPayout = {
+    _count: CommissionPayoutCountAggregateOutputType | null
+    _avg: CommissionPayoutAvgAggregateOutputType | null
+    _sum: CommissionPayoutSumAggregateOutputType | null
+    _min: CommissionPayoutMinAggregateOutputType | null
+    _max: CommissionPayoutMaxAggregateOutputType | null
+  }
+
+  export type CommissionPayoutAvgAggregateOutputType = {
+    id: number | null
+    seller_id: number | null
+    amount: number | null
+    month: number | null
+    year: number | null
+  }
+
+  export type CommissionPayoutSumAggregateOutputType = {
+    id: number | null
+    seller_id: number | null
+    amount: number | null
+    month: number | null
+    year: number | null
+  }
+
+  export type CommissionPayoutMinAggregateOutputType = {
+    id: number | null
+    seller_id: number | null
+    amount: number | null
+    date: Date | null
+    notes: string | null
+    month: number | null
+    year: number | null
+    created_at: Date | null
+  }
+
+  export type CommissionPayoutMaxAggregateOutputType = {
+    id: number | null
+    seller_id: number | null
+    amount: number | null
+    date: Date | null
+    notes: string | null
+    month: number | null
+    year: number | null
+    created_at: Date | null
+  }
+
+  export type CommissionPayoutCountAggregateOutputType = {
+    id: number
+    seller_id: number
+    amount: number
+    date: number
+    notes: number
+    month: number
+    year: number
+    created_at: number
+    _all: number
+  }
+
+
+  export type CommissionPayoutAvgAggregateInputType = {
+    id?: true
+    seller_id?: true
+    amount?: true
+    month?: true
+    year?: true
+  }
+
+  export type CommissionPayoutSumAggregateInputType = {
+    id?: true
+    seller_id?: true
+    amount?: true
+    month?: true
+    year?: true
+  }
+
+  export type CommissionPayoutMinAggregateInputType = {
+    id?: true
+    seller_id?: true
+    amount?: true
+    date?: true
+    notes?: true
+    month?: true
+    year?: true
+    created_at?: true
+  }
+
+  export type CommissionPayoutMaxAggregateInputType = {
+    id?: true
+    seller_id?: true
+    amount?: true
+    date?: true
+    notes?: true
+    month?: true
+    year?: true
+    created_at?: true
+  }
+
+  export type CommissionPayoutCountAggregateInputType = {
+    id?: true
+    seller_id?: true
+    amount?: true
+    date?: true
+    notes?: true
+    month?: true
+    year?: true
+    created_at?: true
+    _all?: true
+  }
+
+  export type CommissionPayoutAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which CommissionPayout to aggregate.
+     */
+    where?: CommissionPayoutWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CommissionPayouts to fetch.
+     */
+    orderBy?: CommissionPayoutOrderByWithRelationInput | CommissionPayoutOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: CommissionPayoutWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CommissionPayouts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CommissionPayouts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned CommissionPayouts
+    **/
+    _count?: true | CommissionPayoutCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: CommissionPayoutAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: CommissionPayoutSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: CommissionPayoutMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: CommissionPayoutMaxAggregateInputType
+  }
+
+  export type GetCommissionPayoutAggregateType<T extends CommissionPayoutAggregateArgs> = {
+        [P in keyof T & keyof AggregateCommissionPayout]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateCommissionPayout[P]>
+      : GetScalarType<T[P], AggregateCommissionPayout[P]>
+  }
+
+
+
+
+  export type CommissionPayoutGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CommissionPayoutWhereInput
+    orderBy?: CommissionPayoutOrderByWithAggregationInput | CommissionPayoutOrderByWithAggregationInput[]
+    by: CommissionPayoutScalarFieldEnum[] | CommissionPayoutScalarFieldEnum
+    having?: CommissionPayoutScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: CommissionPayoutCountAggregateInputType | true
+    _avg?: CommissionPayoutAvgAggregateInputType
+    _sum?: CommissionPayoutSumAggregateInputType
+    _min?: CommissionPayoutMinAggregateInputType
+    _max?: CommissionPayoutMaxAggregateInputType
+  }
+
+  export type CommissionPayoutGroupByOutputType = {
+    id: number
+    seller_id: number
+    amount: number
+    date: Date
+    notes: string | null
+    month: number
+    year: number
+    created_at: Date
+    _count: CommissionPayoutCountAggregateOutputType | null
+    _avg: CommissionPayoutAvgAggregateOutputType | null
+    _sum: CommissionPayoutSumAggregateOutputType | null
+    _min: CommissionPayoutMinAggregateOutputType | null
+    _max: CommissionPayoutMaxAggregateOutputType | null
+  }
+
+  type GetCommissionPayoutGroupByPayload<T extends CommissionPayoutGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<CommissionPayoutGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof CommissionPayoutGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], CommissionPayoutGroupByOutputType[P]>
+            : GetScalarType<T[P], CommissionPayoutGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type CommissionPayoutSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    seller_id?: boolean
+    amount?: boolean
+    date?: boolean
+    notes?: boolean
+    month?: boolean
+    year?: boolean
+    created_at?: boolean
+    seller?: boolean | SellerDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["commissionPayout"]>
+
+  export type CommissionPayoutSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    seller_id?: boolean
+    amount?: boolean
+    date?: boolean
+    notes?: boolean
+    month?: boolean
+    year?: boolean
+    created_at?: boolean
+    seller?: boolean | SellerDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["commissionPayout"]>
+
+  export type CommissionPayoutSelectScalar = {
+    id?: boolean
+    seller_id?: boolean
+    amount?: boolean
+    date?: boolean
+    notes?: boolean
+    month?: boolean
+    year?: boolean
+    created_at?: boolean
+  }
+
+  export type CommissionPayoutInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    seller?: boolean | SellerDefaultArgs<ExtArgs>
+  }
+  export type CommissionPayoutIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    seller?: boolean | SellerDefaultArgs<ExtArgs>
+  }
+
+  export type $CommissionPayoutPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "CommissionPayout"
+    objects: {
+      seller: Prisma.$SellerPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      seller_id: number
+      amount: number
+      date: Date
+      notes: string | null
+      month: number
+      year: number
+      created_at: Date
+    }, ExtArgs["result"]["commissionPayout"]>
+    composites: {}
+  }
+
+  type CommissionPayoutGetPayload<S extends boolean | null | undefined | CommissionPayoutDefaultArgs> = $Result.GetResult<Prisma.$CommissionPayoutPayload, S>
+
+  type CommissionPayoutCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<CommissionPayoutFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: CommissionPayoutCountAggregateInputType | true
+    }
+
+  export interface CommissionPayoutDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['CommissionPayout'], meta: { name: 'CommissionPayout' } }
+    /**
+     * Find zero or one CommissionPayout that matches the filter.
+     * @param {CommissionPayoutFindUniqueArgs} args - Arguments to find a CommissionPayout
+     * @example
+     * // Get one CommissionPayout
+     * const commissionPayout = await prisma.commissionPayout.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends CommissionPayoutFindUniqueArgs>(args: SelectSubset<T, CommissionPayoutFindUniqueArgs<ExtArgs>>): Prisma__CommissionPayoutClient<$Result.GetResult<Prisma.$CommissionPayoutPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one CommissionPayout that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {CommissionPayoutFindUniqueOrThrowArgs} args - Arguments to find a CommissionPayout
+     * @example
+     * // Get one CommissionPayout
+     * const commissionPayout = await prisma.commissionPayout.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends CommissionPayoutFindUniqueOrThrowArgs>(args: SelectSubset<T, CommissionPayoutFindUniqueOrThrowArgs<ExtArgs>>): Prisma__CommissionPayoutClient<$Result.GetResult<Prisma.$CommissionPayoutPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first CommissionPayout that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CommissionPayoutFindFirstArgs} args - Arguments to find a CommissionPayout
+     * @example
+     * // Get one CommissionPayout
+     * const commissionPayout = await prisma.commissionPayout.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends CommissionPayoutFindFirstArgs>(args?: SelectSubset<T, CommissionPayoutFindFirstArgs<ExtArgs>>): Prisma__CommissionPayoutClient<$Result.GetResult<Prisma.$CommissionPayoutPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first CommissionPayout that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CommissionPayoutFindFirstOrThrowArgs} args - Arguments to find a CommissionPayout
+     * @example
+     * // Get one CommissionPayout
+     * const commissionPayout = await prisma.commissionPayout.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends CommissionPayoutFindFirstOrThrowArgs>(args?: SelectSubset<T, CommissionPayoutFindFirstOrThrowArgs<ExtArgs>>): Prisma__CommissionPayoutClient<$Result.GetResult<Prisma.$CommissionPayoutPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more CommissionPayouts that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CommissionPayoutFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all CommissionPayouts
+     * const commissionPayouts = await prisma.commissionPayout.findMany()
+     * 
+     * // Get first 10 CommissionPayouts
+     * const commissionPayouts = await prisma.commissionPayout.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const commissionPayoutWithIdOnly = await prisma.commissionPayout.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends CommissionPayoutFindManyArgs>(args?: SelectSubset<T, CommissionPayoutFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CommissionPayoutPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a CommissionPayout.
+     * @param {CommissionPayoutCreateArgs} args - Arguments to create a CommissionPayout.
+     * @example
+     * // Create one CommissionPayout
+     * const CommissionPayout = await prisma.commissionPayout.create({
+     *   data: {
+     *     // ... data to create a CommissionPayout
+     *   }
+     * })
+     * 
+     */
+    create<T extends CommissionPayoutCreateArgs>(args: SelectSubset<T, CommissionPayoutCreateArgs<ExtArgs>>): Prisma__CommissionPayoutClient<$Result.GetResult<Prisma.$CommissionPayoutPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many CommissionPayouts.
+     * @param {CommissionPayoutCreateManyArgs} args - Arguments to create many CommissionPayouts.
+     * @example
+     * // Create many CommissionPayouts
+     * const commissionPayout = await prisma.commissionPayout.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends CommissionPayoutCreateManyArgs>(args?: SelectSubset<T, CommissionPayoutCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many CommissionPayouts and returns the data saved in the database.
+     * @param {CommissionPayoutCreateManyAndReturnArgs} args - Arguments to create many CommissionPayouts.
+     * @example
+     * // Create many CommissionPayouts
+     * const commissionPayout = await prisma.commissionPayout.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many CommissionPayouts and only return the `id`
+     * const commissionPayoutWithIdOnly = await prisma.commissionPayout.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends CommissionPayoutCreateManyAndReturnArgs>(args?: SelectSubset<T, CommissionPayoutCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CommissionPayoutPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a CommissionPayout.
+     * @param {CommissionPayoutDeleteArgs} args - Arguments to delete one CommissionPayout.
+     * @example
+     * // Delete one CommissionPayout
+     * const CommissionPayout = await prisma.commissionPayout.delete({
+     *   where: {
+     *     // ... filter to delete one CommissionPayout
+     *   }
+     * })
+     * 
+     */
+    delete<T extends CommissionPayoutDeleteArgs>(args: SelectSubset<T, CommissionPayoutDeleteArgs<ExtArgs>>): Prisma__CommissionPayoutClient<$Result.GetResult<Prisma.$CommissionPayoutPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one CommissionPayout.
+     * @param {CommissionPayoutUpdateArgs} args - Arguments to update one CommissionPayout.
+     * @example
+     * // Update one CommissionPayout
+     * const commissionPayout = await prisma.commissionPayout.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends CommissionPayoutUpdateArgs>(args: SelectSubset<T, CommissionPayoutUpdateArgs<ExtArgs>>): Prisma__CommissionPayoutClient<$Result.GetResult<Prisma.$CommissionPayoutPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more CommissionPayouts.
+     * @param {CommissionPayoutDeleteManyArgs} args - Arguments to filter CommissionPayouts to delete.
+     * @example
+     * // Delete a few CommissionPayouts
+     * const { count } = await prisma.commissionPayout.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends CommissionPayoutDeleteManyArgs>(args?: SelectSubset<T, CommissionPayoutDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more CommissionPayouts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CommissionPayoutUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many CommissionPayouts
+     * const commissionPayout = await prisma.commissionPayout.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends CommissionPayoutUpdateManyArgs>(args: SelectSubset<T, CommissionPayoutUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one CommissionPayout.
+     * @param {CommissionPayoutUpsertArgs} args - Arguments to update or create a CommissionPayout.
+     * @example
+     * // Update or create a CommissionPayout
+     * const commissionPayout = await prisma.commissionPayout.upsert({
+     *   create: {
+     *     // ... data to create a CommissionPayout
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the CommissionPayout we want to update
+     *   }
+     * })
+     */
+    upsert<T extends CommissionPayoutUpsertArgs>(args: SelectSubset<T, CommissionPayoutUpsertArgs<ExtArgs>>): Prisma__CommissionPayoutClient<$Result.GetResult<Prisma.$CommissionPayoutPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of CommissionPayouts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CommissionPayoutCountArgs} args - Arguments to filter CommissionPayouts to count.
+     * @example
+     * // Count the number of CommissionPayouts
+     * const count = await prisma.commissionPayout.count({
+     *   where: {
+     *     // ... the filter for the CommissionPayouts we want to count
+     *   }
+     * })
+    **/
+    count<T extends CommissionPayoutCountArgs>(
+      args?: Subset<T, CommissionPayoutCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], CommissionPayoutCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a CommissionPayout.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CommissionPayoutAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends CommissionPayoutAggregateArgs>(args: Subset<T, CommissionPayoutAggregateArgs>): Prisma.PrismaPromise<GetCommissionPayoutAggregateType<T>>
+
+    /**
+     * Group by CommissionPayout.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CommissionPayoutGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends CommissionPayoutGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: CommissionPayoutGroupByArgs['orderBy'] }
+        : { orderBy?: CommissionPayoutGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, CommissionPayoutGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetCommissionPayoutGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the CommissionPayout model
+   */
+  readonly fields: CommissionPayoutFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for CommissionPayout.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__CommissionPayoutClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    seller<T extends SellerDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SellerDefaultArgs<ExtArgs>>): Prisma__SellerClient<$Result.GetResult<Prisma.$SellerPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the CommissionPayout model
+   */ 
+  interface CommissionPayoutFieldRefs {
+    readonly id: FieldRef<"CommissionPayout", 'Int'>
+    readonly seller_id: FieldRef<"CommissionPayout", 'Int'>
+    readonly amount: FieldRef<"CommissionPayout", 'Float'>
+    readonly date: FieldRef<"CommissionPayout", 'DateTime'>
+    readonly notes: FieldRef<"CommissionPayout", 'String'>
+    readonly month: FieldRef<"CommissionPayout", 'Int'>
+    readonly year: FieldRef<"CommissionPayout", 'Int'>
+    readonly created_at: FieldRef<"CommissionPayout", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * CommissionPayout findUnique
+   */
+  export type CommissionPayoutFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CommissionPayout
+     */
+    select?: CommissionPayoutSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CommissionPayoutInclude<ExtArgs> | null
+    /**
+     * Filter, which CommissionPayout to fetch.
+     */
+    where: CommissionPayoutWhereUniqueInput
+  }
+
+  /**
+   * CommissionPayout findUniqueOrThrow
+   */
+  export type CommissionPayoutFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CommissionPayout
+     */
+    select?: CommissionPayoutSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CommissionPayoutInclude<ExtArgs> | null
+    /**
+     * Filter, which CommissionPayout to fetch.
+     */
+    where: CommissionPayoutWhereUniqueInput
+  }
+
+  /**
+   * CommissionPayout findFirst
+   */
+  export type CommissionPayoutFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CommissionPayout
+     */
+    select?: CommissionPayoutSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CommissionPayoutInclude<ExtArgs> | null
+    /**
+     * Filter, which CommissionPayout to fetch.
+     */
+    where?: CommissionPayoutWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CommissionPayouts to fetch.
+     */
+    orderBy?: CommissionPayoutOrderByWithRelationInput | CommissionPayoutOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for CommissionPayouts.
+     */
+    cursor?: CommissionPayoutWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CommissionPayouts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CommissionPayouts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CommissionPayouts.
+     */
+    distinct?: CommissionPayoutScalarFieldEnum | CommissionPayoutScalarFieldEnum[]
+  }
+
+  /**
+   * CommissionPayout findFirstOrThrow
+   */
+  export type CommissionPayoutFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CommissionPayout
+     */
+    select?: CommissionPayoutSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CommissionPayoutInclude<ExtArgs> | null
+    /**
+     * Filter, which CommissionPayout to fetch.
+     */
+    where?: CommissionPayoutWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CommissionPayouts to fetch.
+     */
+    orderBy?: CommissionPayoutOrderByWithRelationInput | CommissionPayoutOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for CommissionPayouts.
+     */
+    cursor?: CommissionPayoutWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CommissionPayouts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CommissionPayouts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CommissionPayouts.
+     */
+    distinct?: CommissionPayoutScalarFieldEnum | CommissionPayoutScalarFieldEnum[]
+  }
+
+  /**
+   * CommissionPayout findMany
+   */
+  export type CommissionPayoutFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CommissionPayout
+     */
+    select?: CommissionPayoutSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CommissionPayoutInclude<ExtArgs> | null
+    /**
+     * Filter, which CommissionPayouts to fetch.
+     */
+    where?: CommissionPayoutWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CommissionPayouts to fetch.
+     */
+    orderBy?: CommissionPayoutOrderByWithRelationInput | CommissionPayoutOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing CommissionPayouts.
+     */
+    cursor?: CommissionPayoutWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CommissionPayouts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CommissionPayouts.
+     */
+    skip?: number
+    distinct?: CommissionPayoutScalarFieldEnum | CommissionPayoutScalarFieldEnum[]
+  }
+
+  /**
+   * CommissionPayout create
+   */
+  export type CommissionPayoutCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CommissionPayout
+     */
+    select?: CommissionPayoutSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CommissionPayoutInclude<ExtArgs> | null
+    /**
+     * The data needed to create a CommissionPayout.
+     */
+    data: XOR<CommissionPayoutCreateInput, CommissionPayoutUncheckedCreateInput>
+  }
+
+  /**
+   * CommissionPayout createMany
+   */
+  export type CommissionPayoutCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many CommissionPayouts.
+     */
+    data: CommissionPayoutCreateManyInput | CommissionPayoutCreateManyInput[]
+  }
+
+  /**
+   * CommissionPayout createManyAndReturn
+   */
+  export type CommissionPayoutCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CommissionPayout
+     */
+    select?: CommissionPayoutSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many CommissionPayouts.
+     */
+    data: CommissionPayoutCreateManyInput | CommissionPayoutCreateManyInput[]
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CommissionPayoutIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * CommissionPayout update
+   */
+  export type CommissionPayoutUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CommissionPayout
+     */
+    select?: CommissionPayoutSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CommissionPayoutInclude<ExtArgs> | null
+    /**
+     * The data needed to update a CommissionPayout.
+     */
+    data: XOR<CommissionPayoutUpdateInput, CommissionPayoutUncheckedUpdateInput>
+    /**
+     * Choose, which CommissionPayout to update.
+     */
+    where: CommissionPayoutWhereUniqueInput
+  }
+
+  /**
+   * CommissionPayout updateMany
+   */
+  export type CommissionPayoutUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update CommissionPayouts.
+     */
+    data: XOR<CommissionPayoutUpdateManyMutationInput, CommissionPayoutUncheckedUpdateManyInput>
+    /**
+     * Filter which CommissionPayouts to update
+     */
+    where?: CommissionPayoutWhereInput
+  }
+
+  /**
+   * CommissionPayout upsert
+   */
+  export type CommissionPayoutUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CommissionPayout
+     */
+    select?: CommissionPayoutSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CommissionPayoutInclude<ExtArgs> | null
+    /**
+     * The filter to search for the CommissionPayout to update in case it exists.
+     */
+    where: CommissionPayoutWhereUniqueInput
+    /**
+     * In case the CommissionPayout found by the `where` argument doesn't exist, create a new CommissionPayout with this data.
+     */
+    create: XOR<CommissionPayoutCreateInput, CommissionPayoutUncheckedCreateInput>
+    /**
+     * In case the CommissionPayout was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<CommissionPayoutUpdateInput, CommissionPayoutUncheckedUpdateInput>
+  }
+
+  /**
+   * CommissionPayout delete
+   */
+  export type CommissionPayoutDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CommissionPayout
+     */
+    select?: CommissionPayoutSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CommissionPayoutInclude<ExtArgs> | null
+    /**
+     * Filter which CommissionPayout to delete.
+     */
+    where: CommissionPayoutWhereUniqueInput
+  }
+
+  /**
+   * CommissionPayout deleteMany
+   */
+  export type CommissionPayoutDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which CommissionPayouts to delete
+     */
+    where?: CommissionPayoutWhereInput
+  }
+
+  /**
+   * CommissionPayout without action
+   */
+  export type CommissionPayoutDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CommissionPayout
+     */
+    select?: CommissionPayoutSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CommissionPayoutInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
   export const TransactionIsolationLevel: {
-    ReadUncommitted: 'ReadUncommitted',
-    ReadCommitted: 'ReadCommitted',
-    RepeatableRead: 'RepeatableRead',
     Serializable: 'Serializable'
   };
 
@@ -11300,10 +12431,25 @@ export namespace Prisma {
     code: 'code',
     warehouse_id: 'warehouse_id',
     active: 'active',
-    created_at: 'created_at'
+    created_at: 'created_at',
+    commission_pct: 'commission_pct'
   };
 
   export type SellerScalarFieldEnum = (typeof SellerScalarFieldEnum)[keyof typeof SellerScalarFieldEnum]
+
+
+  export const CommissionPayoutScalarFieldEnum: {
+    id: 'id',
+    seller_id: 'seller_id',
+    amount: 'amount',
+    date: 'date',
+    notes: 'notes',
+    month: 'month',
+    year: 'year',
+    created_at: 'created_at'
+  };
+
+  export type CommissionPayoutScalarFieldEnum = (typeof CommissionPayoutScalarFieldEnum)[keyof typeof CommissionPayoutScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -11312,14 +12458,6 @@ export namespace Prisma {
   };
 
   export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
-
-
-  export const QueryMode: {
-    default: 'default',
-    insensitive: 'insensitive'
-  };
-
-  export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
 
 
   export const NullsOrder: {
@@ -11343,23 +12481,9 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Int[]'
-   */
-  export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
-    
-
-
-  /**
    * Reference to a field of type 'String'
    */
   export type StringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String'>
-    
-
-
-  /**
-   * Reference to a field of type 'String[]'
-   */
-  export type ListStringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String[]'>
     
 
 
@@ -11378,23 +12502,9 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Float[]'
-   */
-  export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
-    
-
-
-  /**
    * Reference to a field of type 'DateTime'
    */
   export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
-    
-
-
-  /**
-   * Reference to a field of type 'DateTime[]'
-   */
-  export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
     
   /**
    * Deep Input Types
@@ -12077,8 +13187,10 @@ export namespace Prisma {
     warehouse_id?: IntFilter<"Seller"> | number
     active?: BoolFilter<"Seller"> | boolean
     created_at?: DateTimeFilter<"Seller"> | Date | string
+    commission_pct?: FloatFilter<"Seller"> | number
     warehouse?: XOR<WarehouseRelationFilter, WarehouseWhereInput>
     documents?: InventoryDocumentListRelationFilter
+    payouts?: CommissionPayoutListRelationFilter
   }
 
   export type SellerOrderByWithRelationInput = {
@@ -12088,8 +13200,10 @@ export namespace Prisma {
     warehouse_id?: SortOrder
     active?: SortOrder
     created_at?: SortOrder
+    commission_pct?: SortOrder
     warehouse?: WarehouseOrderByWithRelationInput
     documents?: InventoryDocumentOrderByRelationAggregateInput
+    payouts?: CommissionPayoutOrderByRelationAggregateInput
   }
 
   export type SellerWhereUniqueInput = Prisma.AtLeast<{
@@ -12102,8 +13216,10 @@ export namespace Prisma {
     warehouse_id?: IntFilter<"Seller"> | number
     active?: BoolFilter<"Seller"> | boolean
     created_at?: DateTimeFilter<"Seller"> | Date | string
+    commission_pct?: FloatFilter<"Seller"> | number
     warehouse?: XOR<WarehouseRelationFilter, WarehouseWhereInput>
     documents?: InventoryDocumentListRelationFilter
+    payouts?: CommissionPayoutListRelationFilter
   }, "id" | "code">
 
   export type SellerOrderByWithAggregationInput = {
@@ -12113,6 +13229,7 @@ export namespace Prisma {
     warehouse_id?: SortOrder
     active?: SortOrder
     created_at?: SortOrder
+    commission_pct?: SortOrder
     _count?: SellerCountOrderByAggregateInput
     _avg?: SellerAvgOrderByAggregateInput
     _max?: SellerMaxOrderByAggregateInput
@@ -12130,6 +13247,79 @@ export namespace Prisma {
     warehouse_id?: IntWithAggregatesFilter<"Seller"> | number
     active?: BoolWithAggregatesFilter<"Seller"> | boolean
     created_at?: DateTimeWithAggregatesFilter<"Seller"> | Date | string
+    commission_pct?: FloatWithAggregatesFilter<"Seller"> | number
+  }
+
+  export type CommissionPayoutWhereInput = {
+    AND?: CommissionPayoutWhereInput | CommissionPayoutWhereInput[]
+    OR?: CommissionPayoutWhereInput[]
+    NOT?: CommissionPayoutWhereInput | CommissionPayoutWhereInput[]
+    id?: IntFilter<"CommissionPayout"> | number
+    seller_id?: IntFilter<"CommissionPayout"> | number
+    amount?: FloatFilter<"CommissionPayout"> | number
+    date?: DateTimeFilter<"CommissionPayout"> | Date | string
+    notes?: StringNullableFilter<"CommissionPayout"> | string | null
+    month?: IntFilter<"CommissionPayout"> | number
+    year?: IntFilter<"CommissionPayout"> | number
+    created_at?: DateTimeFilter<"CommissionPayout"> | Date | string
+    seller?: XOR<SellerRelationFilter, SellerWhereInput>
+  }
+
+  export type CommissionPayoutOrderByWithRelationInput = {
+    id?: SortOrder
+    seller_id?: SortOrder
+    amount?: SortOrder
+    date?: SortOrder
+    notes?: SortOrderInput | SortOrder
+    month?: SortOrder
+    year?: SortOrder
+    created_at?: SortOrder
+    seller?: SellerOrderByWithRelationInput
+  }
+
+  export type CommissionPayoutWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    AND?: CommissionPayoutWhereInput | CommissionPayoutWhereInput[]
+    OR?: CommissionPayoutWhereInput[]
+    NOT?: CommissionPayoutWhereInput | CommissionPayoutWhereInput[]
+    seller_id?: IntFilter<"CommissionPayout"> | number
+    amount?: FloatFilter<"CommissionPayout"> | number
+    date?: DateTimeFilter<"CommissionPayout"> | Date | string
+    notes?: StringNullableFilter<"CommissionPayout"> | string | null
+    month?: IntFilter<"CommissionPayout"> | number
+    year?: IntFilter<"CommissionPayout"> | number
+    created_at?: DateTimeFilter<"CommissionPayout"> | Date | string
+    seller?: XOR<SellerRelationFilter, SellerWhereInput>
+  }, "id">
+
+  export type CommissionPayoutOrderByWithAggregationInput = {
+    id?: SortOrder
+    seller_id?: SortOrder
+    amount?: SortOrder
+    date?: SortOrder
+    notes?: SortOrderInput | SortOrder
+    month?: SortOrder
+    year?: SortOrder
+    created_at?: SortOrder
+    _count?: CommissionPayoutCountOrderByAggregateInput
+    _avg?: CommissionPayoutAvgOrderByAggregateInput
+    _max?: CommissionPayoutMaxOrderByAggregateInput
+    _min?: CommissionPayoutMinOrderByAggregateInput
+    _sum?: CommissionPayoutSumOrderByAggregateInput
+  }
+
+  export type CommissionPayoutScalarWhereWithAggregatesInput = {
+    AND?: CommissionPayoutScalarWhereWithAggregatesInput | CommissionPayoutScalarWhereWithAggregatesInput[]
+    OR?: CommissionPayoutScalarWhereWithAggregatesInput[]
+    NOT?: CommissionPayoutScalarWhereWithAggregatesInput | CommissionPayoutScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"CommissionPayout"> | number
+    seller_id?: IntWithAggregatesFilter<"CommissionPayout"> | number
+    amount?: FloatWithAggregatesFilter<"CommissionPayout"> | number
+    date?: DateTimeWithAggregatesFilter<"CommissionPayout"> | Date | string
+    notes?: StringNullableWithAggregatesFilter<"CommissionPayout"> | string | null
+    month?: IntWithAggregatesFilter<"CommissionPayout"> | number
+    year?: IntWithAggregatesFilter<"CommissionPayout"> | number
+    created_at?: DateTimeWithAggregatesFilter<"CommissionPayout"> | Date | string
   }
 
   export type UserCreateInput = {
@@ -12844,8 +14034,10 @@ export namespace Prisma {
     code: string
     active?: boolean
     created_at?: Date | string
+    commission_pct?: number
     warehouse: WarehouseCreateNestedOneWithoutSellersInput
     documents?: InventoryDocumentCreateNestedManyWithoutSellerInput
+    payouts?: CommissionPayoutCreateNestedManyWithoutSellerInput
   }
 
   export type SellerUncheckedCreateInput = {
@@ -12855,7 +14047,9 @@ export namespace Prisma {
     warehouse_id: number
     active?: boolean
     created_at?: Date | string
+    commission_pct?: number
     documents?: InventoryDocumentUncheckedCreateNestedManyWithoutSellerInput
+    payouts?: CommissionPayoutUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type SellerUpdateInput = {
@@ -12863,8 +14057,10 @@ export namespace Prisma {
     code?: StringFieldUpdateOperationsInput | string
     active?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    commission_pct?: FloatFieldUpdateOperationsInput | number
     warehouse?: WarehouseUpdateOneRequiredWithoutSellersNestedInput
     documents?: InventoryDocumentUpdateManyWithoutSellerNestedInput
+    payouts?: CommissionPayoutUpdateManyWithoutSellerNestedInput
   }
 
   export type SellerUncheckedUpdateInput = {
@@ -12874,7 +14070,9 @@ export namespace Prisma {
     warehouse_id?: IntFieldUpdateOperationsInput | number
     active?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    commission_pct?: FloatFieldUpdateOperationsInput | number
     documents?: InventoryDocumentUncheckedUpdateManyWithoutSellerNestedInput
+    payouts?: CommissionPayoutUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type SellerCreateManyInput = {
@@ -12884,6 +14082,7 @@ export namespace Prisma {
     warehouse_id: number
     active?: boolean
     created_at?: Date | string
+    commission_pct?: number
   }
 
   export type SellerUpdateManyMutationInput = {
@@ -12891,6 +14090,7 @@ export namespace Prisma {
     code?: StringFieldUpdateOperationsInput | string
     active?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    commission_pct?: FloatFieldUpdateOperationsInput | number
   }
 
   export type SellerUncheckedUpdateManyInput = {
@@ -12900,12 +14100,86 @@ export namespace Prisma {
     warehouse_id?: IntFieldUpdateOperationsInput | number
     active?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    commission_pct?: FloatFieldUpdateOperationsInput | number
+  }
+
+  export type CommissionPayoutCreateInput = {
+    amount: number
+    date: Date | string
+    notes?: string | null
+    month: number
+    year: number
+    created_at?: Date | string
+    seller: SellerCreateNestedOneWithoutPayoutsInput
+  }
+
+  export type CommissionPayoutUncheckedCreateInput = {
+    id?: number
+    seller_id: number
+    amount: number
+    date: Date | string
+    notes?: string | null
+    month: number
+    year: number
+    created_at?: Date | string
+  }
+
+  export type CommissionPayoutUpdateInput = {
+    amount?: FloatFieldUpdateOperationsInput | number
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    month?: IntFieldUpdateOperationsInput | number
+    year?: IntFieldUpdateOperationsInput | number
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    seller?: SellerUpdateOneRequiredWithoutPayoutsNestedInput
+  }
+
+  export type CommissionPayoutUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    seller_id?: IntFieldUpdateOperationsInput | number
+    amount?: FloatFieldUpdateOperationsInput | number
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    month?: IntFieldUpdateOperationsInput | number
+    year?: IntFieldUpdateOperationsInput | number
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CommissionPayoutCreateManyInput = {
+    id?: number
+    seller_id: number
+    amount: number
+    date: Date | string
+    notes?: string | null
+    month: number
+    year: number
+    created_at?: Date | string
+  }
+
+  export type CommissionPayoutUpdateManyMutationInput = {
+    amount?: FloatFieldUpdateOperationsInput | number
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    month?: IntFieldUpdateOperationsInput | number
+    year?: IntFieldUpdateOperationsInput | number
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CommissionPayoutUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    seller_id?: IntFieldUpdateOperationsInput | number
+    amount?: FloatFieldUpdateOperationsInput | number
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    month?: IntFieldUpdateOperationsInput | number
+    year?: IntFieldUpdateOperationsInput | number
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type IntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
     lt?: number | IntFieldRefInput<$PrismaModel>
     lte?: number | IntFieldRefInput<$PrismaModel>
     gt?: number | IntFieldRefInput<$PrismaModel>
@@ -12915,8 +14189,8 @@ export namespace Prisma {
 
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
-    in?: string[] | ListStringFieldRefInput<$PrismaModel>
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
+    in?: string[]
+    notIn?: string[]
     lt?: string | StringFieldRefInput<$PrismaModel>
     lte?: string | StringFieldRefInput<$PrismaModel>
     gt?: string | StringFieldRefInput<$PrismaModel>
@@ -12924,7 +14198,6 @@ export namespace Prisma {
     contains?: string | StringFieldRefInput<$PrismaModel>
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
@@ -12962,8 +14235,8 @@ export namespace Prisma {
 
   export type IntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
     lt?: number | IntFieldRefInput<$PrismaModel>
     lte?: number | IntFieldRefInput<$PrismaModel>
     gt?: number | IntFieldRefInput<$PrismaModel>
@@ -12978,8 +14251,8 @@ export namespace Prisma {
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
-    in?: string[] | ListStringFieldRefInput<$PrismaModel>
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
+    in?: string[]
+    notIn?: string[]
     lt?: string | StringFieldRefInput<$PrismaModel>
     lte?: string | StringFieldRefInput<$PrismaModel>
     gt?: string | StringFieldRefInput<$PrismaModel>
@@ -12987,7 +14260,6 @@ export namespace Prisma {
     contains?: string | StringFieldRefInput<$PrismaModel>
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
     not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedStringFilter<$PrismaModel>
@@ -12996,8 +14268,8 @@ export namespace Prisma {
 
   export type StringNullableFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    in?: string[] | null
+    notIn?: string[] | null
     lt?: string | StringFieldRefInput<$PrismaModel>
     lte?: string | StringFieldRefInput<$PrismaModel>
     gt?: string | StringFieldRefInput<$PrismaModel>
@@ -13005,7 +14277,6 @@ export namespace Prisma {
     contains?: string | StringFieldRefInput<$PrismaModel>
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
@@ -13016,8 +14287,8 @@ export namespace Prisma {
 
   export type FloatNullableFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
     lt?: number | FloatFieldRefInput<$PrismaModel>
     lte?: number | FloatFieldRefInput<$PrismaModel>
     gt?: number | FloatFieldRefInput<$PrismaModel>
@@ -13027,8 +14298,8 @@ export namespace Prisma {
 
   export type DateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[]
+    notIn?: Date[] | string[]
     lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
@@ -13130,8 +14401,8 @@ export namespace Prisma {
 
   export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    in?: string[] | null
+    notIn?: string[] | null
     lt?: string | StringFieldRefInput<$PrismaModel>
     lte?: string | StringFieldRefInput<$PrismaModel>
     gt?: string | StringFieldRefInput<$PrismaModel>
@@ -13139,7 +14410,6 @@ export namespace Prisma {
     contains?: string | StringFieldRefInput<$PrismaModel>
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
     not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedStringNullableFilter<$PrismaModel>
@@ -13156,8 +14426,8 @@ export namespace Prisma {
 
   export type FloatNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
     lt?: number | FloatFieldRefInput<$PrismaModel>
     lte?: number | FloatFieldRefInput<$PrismaModel>
     gt?: number | FloatFieldRefInput<$PrismaModel>
@@ -13172,8 +14442,8 @@ export namespace Prisma {
 
   export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[]
+    notIn?: Date[] | string[]
     lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
@@ -13186,8 +14456,8 @@ export namespace Prisma {
 
   export type IntNullableFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
     lt?: number | IntFieldRefInput<$PrismaModel>
     lte?: number | IntFieldRefInput<$PrismaModel>
     gt?: number | IntFieldRefInput<$PrismaModel>
@@ -13257,8 +14527,8 @@ export namespace Prisma {
 
   export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
     lt?: number | IntFieldRefInput<$PrismaModel>
     lte?: number | IntFieldRefInput<$PrismaModel>
     gt?: number | IntFieldRefInput<$PrismaModel>
@@ -13273,8 +14543,8 @@ export namespace Prisma {
 
   export type FloatFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
     lt?: number | FloatFieldRefInput<$PrismaModel>
     lte?: number | FloatFieldRefInput<$PrismaModel>
     gt?: number | FloatFieldRefInput<$PrismaModel>
@@ -13351,8 +14621,8 @@ export namespace Prisma {
 
   export type FloatWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
     lt?: number | FloatFieldRefInput<$PrismaModel>
     lte?: number | FloatFieldRefInput<$PrismaModel>
     gt?: number | FloatFieldRefInput<$PrismaModel>
@@ -13633,6 +14903,16 @@ export namespace Prisma {
     user_id?: SortOrder
   }
 
+  export type CommissionPayoutListRelationFilter = {
+    every?: CommissionPayoutWhereInput
+    some?: CommissionPayoutWhereInput
+    none?: CommissionPayoutWhereInput
+  }
+
+  export type CommissionPayoutOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type SellerCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
@@ -13640,11 +14920,13 @@ export namespace Prisma {
     warehouse_id?: SortOrder
     active?: SortOrder
     created_at?: SortOrder
+    commission_pct?: SortOrder
   }
 
   export type SellerAvgOrderByAggregateInput = {
     id?: SortOrder
     warehouse_id?: SortOrder
+    commission_pct?: SortOrder
   }
 
   export type SellerMaxOrderByAggregateInput = {
@@ -13654,6 +14936,7 @@ export namespace Prisma {
     warehouse_id?: SortOrder
     active?: SortOrder
     created_at?: SortOrder
+    commission_pct?: SortOrder
   }
 
   export type SellerMinOrderByAggregateInput = {
@@ -13663,11 +14946,67 @@ export namespace Prisma {
     warehouse_id?: SortOrder
     active?: SortOrder
     created_at?: SortOrder
+    commission_pct?: SortOrder
   }
 
   export type SellerSumOrderByAggregateInput = {
     id?: SortOrder
     warehouse_id?: SortOrder
+    commission_pct?: SortOrder
+  }
+
+  export type SellerRelationFilter = {
+    is?: SellerWhereInput
+    isNot?: SellerWhereInput
+  }
+
+  export type CommissionPayoutCountOrderByAggregateInput = {
+    id?: SortOrder
+    seller_id?: SortOrder
+    amount?: SortOrder
+    date?: SortOrder
+    notes?: SortOrder
+    month?: SortOrder
+    year?: SortOrder
+    created_at?: SortOrder
+  }
+
+  export type CommissionPayoutAvgOrderByAggregateInput = {
+    id?: SortOrder
+    seller_id?: SortOrder
+    amount?: SortOrder
+    month?: SortOrder
+    year?: SortOrder
+  }
+
+  export type CommissionPayoutMaxOrderByAggregateInput = {
+    id?: SortOrder
+    seller_id?: SortOrder
+    amount?: SortOrder
+    date?: SortOrder
+    notes?: SortOrder
+    month?: SortOrder
+    year?: SortOrder
+    created_at?: SortOrder
+  }
+
+  export type CommissionPayoutMinOrderByAggregateInput = {
+    id?: SortOrder
+    seller_id?: SortOrder
+    amount?: SortOrder
+    date?: SortOrder
+    notes?: SortOrder
+    month?: SortOrder
+    year?: SortOrder
+    created_at?: SortOrder
+  }
+
+  export type CommissionPayoutSumOrderByAggregateInput = {
+    id?: SortOrder
+    seller_id?: SortOrder
+    amount?: SortOrder
+    month?: SortOrder
+    year?: SortOrder
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -14185,11 +15524,25 @@ export namespace Prisma {
     connect?: InventoryDocumentWhereUniqueInput | InventoryDocumentWhereUniqueInput[]
   }
 
+  export type CommissionPayoutCreateNestedManyWithoutSellerInput = {
+    create?: XOR<CommissionPayoutCreateWithoutSellerInput, CommissionPayoutUncheckedCreateWithoutSellerInput> | CommissionPayoutCreateWithoutSellerInput[] | CommissionPayoutUncheckedCreateWithoutSellerInput[]
+    connectOrCreate?: CommissionPayoutCreateOrConnectWithoutSellerInput | CommissionPayoutCreateOrConnectWithoutSellerInput[]
+    createMany?: CommissionPayoutCreateManySellerInputEnvelope
+    connect?: CommissionPayoutWhereUniqueInput | CommissionPayoutWhereUniqueInput[]
+  }
+
   export type InventoryDocumentUncheckedCreateNestedManyWithoutSellerInput = {
     create?: XOR<InventoryDocumentCreateWithoutSellerInput, InventoryDocumentUncheckedCreateWithoutSellerInput> | InventoryDocumentCreateWithoutSellerInput[] | InventoryDocumentUncheckedCreateWithoutSellerInput[]
     connectOrCreate?: InventoryDocumentCreateOrConnectWithoutSellerInput | InventoryDocumentCreateOrConnectWithoutSellerInput[]
     createMany?: InventoryDocumentCreateManySellerInputEnvelope
     connect?: InventoryDocumentWhereUniqueInput | InventoryDocumentWhereUniqueInput[]
+  }
+
+  export type CommissionPayoutUncheckedCreateNestedManyWithoutSellerInput = {
+    create?: XOR<CommissionPayoutCreateWithoutSellerInput, CommissionPayoutUncheckedCreateWithoutSellerInput> | CommissionPayoutCreateWithoutSellerInput[] | CommissionPayoutUncheckedCreateWithoutSellerInput[]
+    connectOrCreate?: CommissionPayoutCreateOrConnectWithoutSellerInput | CommissionPayoutCreateOrConnectWithoutSellerInput[]
+    createMany?: CommissionPayoutCreateManySellerInputEnvelope
+    connect?: CommissionPayoutWhereUniqueInput | CommissionPayoutWhereUniqueInput[]
   }
 
   export type WarehouseUpdateOneRequiredWithoutSellersNestedInput = {
@@ -14214,6 +15567,20 @@ export namespace Prisma {
     deleteMany?: InventoryDocumentScalarWhereInput | InventoryDocumentScalarWhereInput[]
   }
 
+  export type CommissionPayoutUpdateManyWithoutSellerNestedInput = {
+    create?: XOR<CommissionPayoutCreateWithoutSellerInput, CommissionPayoutUncheckedCreateWithoutSellerInput> | CommissionPayoutCreateWithoutSellerInput[] | CommissionPayoutUncheckedCreateWithoutSellerInput[]
+    connectOrCreate?: CommissionPayoutCreateOrConnectWithoutSellerInput | CommissionPayoutCreateOrConnectWithoutSellerInput[]
+    upsert?: CommissionPayoutUpsertWithWhereUniqueWithoutSellerInput | CommissionPayoutUpsertWithWhereUniqueWithoutSellerInput[]
+    createMany?: CommissionPayoutCreateManySellerInputEnvelope
+    set?: CommissionPayoutWhereUniqueInput | CommissionPayoutWhereUniqueInput[]
+    disconnect?: CommissionPayoutWhereUniqueInput | CommissionPayoutWhereUniqueInput[]
+    delete?: CommissionPayoutWhereUniqueInput | CommissionPayoutWhereUniqueInput[]
+    connect?: CommissionPayoutWhereUniqueInput | CommissionPayoutWhereUniqueInput[]
+    update?: CommissionPayoutUpdateWithWhereUniqueWithoutSellerInput | CommissionPayoutUpdateWithWhereUniqueWithoutSellerInput[]
+    updateMany?: CommissionPayoutUpdateManyWithWhereWithoutSellerInput | CommissionPayoutUpdateManyWithWhereWithoutSellerInput[]
+    deleteMany?: CommissionPayoutScalarWhereInput | CommissionPayoutScalarWhereInput[]
+  }
+
   export type InventoryDocumentUncheckedUpdateManyWithoutSellerNestedInput = {
     create?: XOR<InventoryDocumentCreateWithoutSellerInput, InventoryDocumentUncheckedCreateWithoutSellerInput> | InventoryDocumentCreateWithoutSellerInput[] | InventoryDocumentUncheckedCreateWithoutSellerInput[]
     connectOrCreate?: InventoryDocumentCreateOrConnectWithoutSellerInput | InventoryDocumentCreateOrConnectWithoutSellerInput[]
@@ -14228,10 +15595,38 @@ export namespace Prisma {
     deleteMany?: InventoryDocumentScalarWhereInput | InventoryDocumentScalarWhereInput[]
   }
 
+  export type CommissionPayoutUncheckedUpdateManyWithoutSellerNestedInput = {
+    create?: XOR<CommissionPayoutCreateWithoutSellerInput, CommissionPayoutUncheckedCreateWithoutSellerInput> | CommissionPayoutCreateWithoutSellerInput[] | CommissionPayoutUncheckedCreateWithoutSellerInput[]
+    connectOrCreate?: CommissionPayoutCreateOrConnectWithoutSellerInput | CommissionPayoutCreateOrConnectWithoutSellerInput[]
+    upsert?: CommissionPayoutUpsertWithWhereUniqueWithoutSellerInput | CommissionPayoutUpsertWithWhereUniqueWithoutSellerInput[]
+    createMany?: CommissionPayoutCreateManySellerInputEnvelope
+    set?: CommissionPayoutWhereUniqueInput | CommissionPayoutWhereUniqueInput[]
+    disconnect?: CommissionPayoutWhereUniqueInput | CommissionPayoutWhereUniqueInput[]
+    delete?: CommissionPayoutWhereUniqueInput | CommissionPayoutWhereUniqueInput[]
+    connect?: CommissionPayoutWhereUniqueInput | CommissionPayoutWhereUniqueInput[]
+    update?: CommissionPayoutUpdateWithWhereUniqueWithoutSellerInput | CommissionPayoutUpdateWithWhereUniqueWithoutSellerInput[]
+    updateMany?: CommissionPayoutUpdateManyWithWhereWithoutSellerInput | CommissionPayoutUpdateManyWithWhereWithoutSellerInput[]
+    deleteMany?: CommissionPayoutScalarWhereInput | CommissionPayoutScalarWhereInput[]
+  }
+
+  export type SellerCreateNestedOneWithoutPayoutsInput = {
+    create?: XOR<SellerCreateWithoutPayoutsInput, SellerUncheckedCreateWithoutPayoutsInput>
+    connectOrCreate?: SellerCreateOrConnectWithoutPayoutsInput
+    connect?: SellerWhereUniqueInput
+  }
+
+  export type SellerUpdateOneRequiredWithoutPayoutsNestedInput = {
+    create?: XOR<SellerCreateWithoutPayoutsInput, SellerUncheckedCreateWithoutPayoutsInput>
+    connectOrCreate?: SellerCreateOrConnectWithoutPayoutsInput
+    upsert?: SellerUpsertWithoutPayoutsInput
+    connect?: SellerWhereUniqueInput
+    update?: XOR<XOR<SellerUpdateToOneWithWhereWithoutPayoutsInput, SellerUpdateWithoutPayoutsInput>, SellerUncheckedUpdateWithoutPayoutsInput>
+  }
+
   export type NestedIntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
     lt?: number | IntFieldRefInput<$PrismaModel>
     lte?: number | IntFieldRefInput<$PrismaModel>
     gt?: number | IntFieldRefInput<$PrismaModel>
@@ -14241,8 +15636,8 @@ export namespace Prisma {
 
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
-    in?: string[] | ListStringFieldRefInput<$PrismaModel>
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
+    in?: string[]
+    notIn?: string[]
     lt?: string | StringFieldRefInput<$PrismaModel>
     lte?: string | StringFieldRefInput<$PrismaModel>
     gt?: string | StringFieldRefInput<$PrismaModel>
@@ -14255,8 +15650,8 @@ export namespace Prisma {
 
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
     lt?: number | IntFieldRefInput<$PrismaModel>
     lte?: number | IntFieldRefInput<$PrismaModel>
     gt?: number | IntFieldRefInput<$PrismaModel>
@@ -14271,8 +15666,8 @@ export namespace Prisma {
 
   export type NestedFloatFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
     lt?: number | FloatFieldRefInput<$PrismaModel>
     lte?: number | FloatFieldRefInput<$PrismaModel>
     gt?: number | FloatFieldRefInput<$PrismaModel>
@@ -14282,8 +15677,8 @@ export namespace Prisma {
 
   export type NestedStringWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
-    in?: string[] | ListStringFieldRefInput<$PrismaModel>
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
+    in?: string[]
+    notIn?: string[]
     lt?: string | StringFieldRefInput<$PrismaModel>
     lte?: string | StringFieldRefInput<$PrismaModel>
     gt?: string | StringFieldRefInput<$PrismaModel>
@@ -14299,8 +15694,8 @@ export namespace Prisma {
 
   export type NestedStringNullableFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    in?: string[] | null
+    notIn?: string[] | null
     lt?: string | StringFieldRefInput<$PrismaModel>
     lte?: string | StringFieldRefInput<$PrismaModel>
     gt?: string | StringFieldRefInput<$PrismaModel>
@@ -14318,8 +15713,8 @@ export namespace Prisma {
 
   export type NestedFloatNullableFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
     lt?: number | FloatFieldRefInput<$PrismaModel>
     lte?: number | FloatFieldRefInput<$PrismaModel>
     gt?: number | FloatFieldRefInput<$PrismaModel>
@@ -14329,8 +15724,8 @@ export namespace Prisma {
 
   export type NestedDateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[]
+    notIn?: Date[] | string[]
     lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
@@ -14340,8 +15735,8 @@ export namespace Prisma {
 
   export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    in?: string[] | null
+    notIn?: string[] | null
     lt?: string | StringFieldRefInput<$PrismaModel>
     lte?: string | StringFieldRefInput<$PrismaModel>
     gt?: string | StringFieldRefInput<$PrismaModel>
@@ -14357,8 +15752,8 @@ export namespace Prisma {
 
   export type NestedIntNullableFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
     lt?: number | IntFieldRefInput<$PrismaModel>
     lte?: number | IntFieldRefInput<$PrismaModel>
     gt?: number | IntFieldRefInput<$PrismaModel>
@@ -14376,8 +15771,8 @@ export namespace Prisma {
 
   export type NestedFloatNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
     lt?: number | FloatFieldRefInput<$PrismaModel>
     lte?: number | FloatFieldRefInput<$PrismaModel>
     gt?: number | FloatFieldRefInput<$PrismaModel>
@@ -14392,8 +15787,8 @@ export namespace Prisma {
 
   export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[]
+    notIn?: Date[] | string[]
     lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
@@ -14406,8 +15801,8 @@ export namespace Prisma {
 
   export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
     lt?: number | IntFieldRefInput<$PrismaModel>
     lte?: number | IntFieldRefInput<$PrismaModel>
     gt?: number | IntFieldRefInput<$PrismaModel>
@@ -14422,8 +15817,8 @@ export namespace Prisma {
 
   export type NestedFloatWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
     lt?: number | FloatFieldRefInput<$PrismaModel>
     lte?: number | FloatFieldRefInput<$PrismaModel>
     gt?: number | FloatFieldRefInput<$PrismaModel>
@@ -14462,7 +15857,6 @@ export namespace Prisma {
 
   export type InventoryBalanceCreateManyProductInputEnvelope = {
     data: InventoryBalanceCreateManyProductInput | InventoryBalanceCreateManyProductInput[]
-    skipDuplicates?: boolean
   }
 
   export type InventoryLedgerCreateWithoutProductInput = {
@@ -14503,7 +15897,6 @@ export namespace Prisma {
 
   export type InventoryLedgerCreateManyProductInputEnvelope = {
     data: InventoryLedgerCreateManyProductInput | InventoryLedgerCreateManyProductInput[]
-    skipDuplicates?: boolean
   }
 
   export type InventoryDocumentLineCreateWithoutProductInput = {
@@ -14534,7 +15927,6 @@ export namespace Prisma {
 
   export type InventoryDocumentLineCreateManyProductInputEnvelope = {
     data: InventoryDocumentLineCreateManyProductInput | InventoryDocumentLineCreateManyProductInput[]
-    skipDuplicates?: boolean
   }
 
   export type InventoryBalanceUpsertWithWhereUniqueWithoutProductInput = {
@@ -14660,7 +16052,6 @@ export namespace Prisma {
 
   export type InventoryBalanceCreateManyWarehouseInputEnvelope = {
     data: InventoryBalanceCreateManyWarehouseInput | InventoryBalanceCreateManyWarehouseInput[]
-    skipDuplicates?: boolean
   }
 
   export type InventoryDocumentCreateWithoutWarehouse_fromInput = {
@@ -14701,7 +16092,6 @@ export namespace Prisma {
 
   export type InventoryDocumentCreateManyWarehouse_fromInputEnvelope = {
     data: InventoryDocumentCreateManyWarehouse_fromInput | InventoryDocumentCreateManyWarehouse_fromInput[]
-    skipDuplicates?: boolean
   }
 
   export type InventoryDocumentCreateWithoutWarehouse_toInput = {
@@ -14742,7 +16132,6 @@ export namespace Prisma {
 
   export type InventoryDocumentCreateManyWarehouse_toInputEnvelope = {
     data: InventoryDocumentCreateManyWarehouse_toInput | InventoryDocumentCreateManyWarehouse_toInput[]
-    skipDuplicates?: boolean
   }
 
   export type SellerCreateWithoutWarehouseInput = {
@@ -14750,7 +16139,9 @@ export namespace Prisma {
     code: string
     active?: boolean
     created_at?: Date | string
+    commission_pct?: number
     documents?: InventoryDocumentCreateNestedManyWithoutSellerInput
+    payouts?: CommissionPayoutCreateNestedManyWithoutSellerInput
   }
 
   export type SellerUncheckedCreateWithoutWarehouseInput = {
@@ -14759,7 +16150,9 @@ export namespace Prisma {
     code: string
     active?: boolean
     created_at?: Date | string
+    commission_pct?: number
     documents?: InventoryDocumentUncheckedCreateNestedManyWithoutSellerInput
+    payouts?: CommissionPayoutUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type SellerCreateOrConnectWithoutWarehouseInput = {
@@ -14769,7 +16162,6 @@ export namespace Prisma {
 
   export type SellerCreateManyWarehouseInputEnvelope = {
     data: SellerCreateManyWarehouseInput | SellerCreateManyWarehouseInput[]
-    skipDuplicates?: boolean
   }
 
   export type InventoryBalanceUpsertWithWhereUniqueWithoutWarehouseInput = {
@@ -14865,6 +16257,7 @@ export namespace Prisma {
     warehouse_id?: IntFilter<"Seller"> | number
     active?: BoolFilter<"Seller"> | boolean
     created_at?: DateTimeFilter<"Seller"> | Date | string
+    commission_pct?: FloatFilter<"Seller"> | number
   }
 
   export type ProductCreateWithoutBalancesInput = {
@@ -15080,7 +16473,9 @@ export namespace Prisma {
     code: string
     active?: boolean
     created_at?: Date | string
+    commission_pct?: number
     warehouse: WarehouseCreateNestedOneWithoutSellersInput
+    payouts?: CommissionPayoutCreateNestedManyWithoutSellerInput
   }
 
   export type SellerUncheckedCreateWithoutDocumentsInput = {
@@ -15090,6 +16485,8 @@ export namespace Prisma {
     warehouse_id: number
     active?: boolean
     created_at?: Date | string
+    commission_pct?: number
+    payouts?: CommissionPayoutUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type SellerCreateOrConnectWithoutDocumentsInput = {
@@ -15125,7 +16522,6 @@ export namespace Prisma {
 
   export type InventoryDocumentLineCreateManyDocumentInputEnvelope = {
     data: InventoryDocumentLineCreateManyDocumentInput | InventoryDocumentLineCreateManyDocumentInput[]
-    skipDuplicates?: boolean
   }
 
   export type WarehouseUpsertWithoutDocs_fromInput = {
@@ -15216,7 +16612,9 @@ export namespace Prisma {
     code?: StringFieldUpdateOperationsInput | string
     active?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    commission_pct?: FloatFieldUpdateOperationsInput | number
     warehouse?: WarehouseUpdateOneRequiredWithoutSellersNestedInput
+    payouts?: CommissionPayoutUpdateManyWithoutSellerNestedInput
   }
 
   export type SellerUncheckedUpdateWithoutDocumentsInput = {
@@ -15226,6 +16624,8 @@ export namespace Prisma {
     warehouse_id?: IntFieldUpdateOperationsInput | number
     active?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    commission_pct?: FloatFieldUpdateOperationsInput | number
+    payouts?: CommissionPayoutUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type InventoryDocumentLineUpsertWithWhereUniqueWithoutDocumentInput = {
@@ -15554,7 +16954,34 @@ export namespace Prisma {
 
   export type InventoryDocumentCreateManySellerInputEnvelope = {
     data: InventoryDocumentCreateManySellerInput | InventoryDocumentCreateManySellerInput[]
-    skipDuplicates?: boolean
+  }
+
+  export type CommissionPayoutCreateWithoutSellerInput = {
+    amount: number
+    date: Date | string
+    notes?: string | null
+    month: number
+    year: number
+    created_at?: Date | string
+  }
+
+  export type CommissionPayoutUncheckedCreateWithoutSellerInput = {
+    id?: number
+    amount: number
+    date: Date | string
+    notes?: string | null
+    month: number
+    year: number
+    created_at?: Date | string
+  }
+
+  export type CommissionPayoutCreateOrConnectWithoutSellerInput = {
+    where: CommissionPayoutWhereUniqueInput
+    create: XOR<CommissionPayoutCreateWithoutSellerInput, CommissionPayoutUncheckedCreateWithoutSellerInput>
+  }
+
+  export type CommissionPayoutCreateManySellerInputEnvelope = {
+    data: CommissionPayoutCreateManySellerInput | CommissionPayoutCreateManySellerInput[]
   }
 
   export type WarehouseUpsertWithoutSellersInput = {
@@ -15607,6 +17034,94 @@ export namespace Prisma {
   export type InventoryDocumentUpdateManyWithWhereWithoutSellerInput = {
     where: InventoryDocumentScalarWhereInput
     data: XOR<InventoryDocumentUpdateManyMutationInput, InventoryDocumentUncheckedUpdateManyWithoutSellerInput>
+  }
+
+  export type CommissionPayoutUpsertWithWhereUniqueWithoutSellerInput = {
+    where: CommissionPayoutWhereUniqueInput
+    update: XOR<CommissionPayoutUpdateWithoutSellerInput, CommissionPayoutUncheckedUpdateWithoutSellerInput>
+    create: XOR<CommissionPayoutCreateWithoutSellerInput, CommissionPayoutUncheckedCreateWithoutSellerInput>
+  }
+
+  export type CommissionPayoutUpdateWithWhereUniqueWithoutSellerInput = {
+    where: CommissionPayoutWhereUniqueInput
+    data: XOR<CommissionPayoutUpdateWithoutSellerInput, CommissionPayoutUncheckedUpdateWithoutSellerInput>
+  }
+
+  export type CommissionPayoutUpdateManyWithWhereWithoutSellerInput = {
+    where: CommissionPayoutScalarWhereInput
+    data: XOR<CommissionPayoutUpdateManyMutationInput, CommissionPayoutUncheckedUpdateManyWithoutSellerInput>
+  }
+
+  export type CommissionPayoutScalarWhereInput = {
+    AND?: CommissionPayoutScalarWhereInput | CommissionPayoutScalarWhereInput[]
+    OR?: CommissionPayoutScalarWhereInput[]
+    NOT?: CommissionPayoutScalarWhereInput | CommissionPayoutScalarWhereInput[]
+    id?: IntFilter<"CommissionPayout"> | number
+    seller_id?: IntFilter<"CommissionPayout"> | number
+    amount?: FloatFilter<"CommissionPayout"> | number
+    date?: DateTimeFilter<"CommissionPayout"> | Date | string
+    notes?: StringNullableFilter<"CommissionPayout"> | string | null
+    month?: IntFilter<"CommissionPayout"> | number
+    year?: IntFilter<"CommissionPayout"> | number
+    created_at?: DateTimeFilter<"CommissionPayout"> | Date | string
+  }
+
+  export type SellerCreateWithoutPayoutsInput = {
+    name: string
+    code: string
+    active?: boolean
+    created_at?: Date | string
+    commission_pct?: number
+    warehouse: WarehouseCreateNestedOneWithoutSellersInput
+    documents?: InventoryDocumentCreateNestedManyWithoutSellerInput
+  }
+
+  export type SellerUncheckedCreateWithoutPayoutsInput = {
+    id?: number
+    name: string
+    code: string
+    warehouse_id: number
+    active?: boolean
+    created_at?: Date | string
+    commission_pct?: number
+    documents?: InventoryDocumentUncheckedCreateNestedManyWithoutSellerInput
+  }
+
+  export type SellerCreateOrConnectWithoutPayoutsInput = {
+    where: SellerWhereUniqueInput
+    create: XOR<SellerCreateWithoutPayoutsInput, SellerUncheckedCreateWithoutPayoutsInput>
+  }
+
+  export type SellerUpsertWithoutPayoutsInput = {
+    update: XOR<SellerUpdateWithoutPayoutsInput, SellerUncheckedUpdateWithoutPayoutsInput>
+    create: XOR<SellerCreateWithoutPayoutsInput, SellerUncheckedCreateWithoutPayoutsInput>
+    where?: SellerWhereInput
+  }
+
+  export type SellerUpdateToOneWithWhereWithoutPayoutsInput = {
+    where?: SellerWhereInput
+    data: XOR<SellerUpdateWithoutPayoutsInput, SellerUncheckedUpdateWithoutPayoutsInput>
+  }
+
+  export type SellerUpdateWithoutPayoutsInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    active?: BoolFieldUpdateOperationsInput | boolean
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    commission_pct?: FloatFieldUpdateOperationsInput | number
+    warehouse?: WarehouseUpdateOneRequiredWithoutSellersNestedInput
+    documents?: InventoryDocumentUpdateManyWithoutSellerNestedInput
+  }
+
+  export type SellerUncheckedUpdateWithoutPayoutsInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    warehouse_id?: IntFieldUpdateOperationsInput | number
+    active?: BoolFieldUpdateOperationsInput | boolean
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    commission_pct?: FloatFieldUpdateOperationsInput | number
+    documents?: InventoryDocumentUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type InventoryBalanceCreateManyProductInput = {
@@ -15800,6 +17315,7 @@ export namespace Prisma {
     code: string
     active?: boolean
     created_at?: Date | string
+    commission_pct?: number
   }
 
   export type InventoryBalanceUpdateWithoutWarehouseInput = {
@@ -15928,7 +17444,9 @@ export namespace Prisma {
     code?: StringFieldUpdateOperationsInput | string
     active?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    commission_pct?: FloatFieldUpdateOperationsInput | number
     documents?: InventoryDocumentUpdateManyWithoutSellerNestedInput
+    payouts?: CommissionPayoutUpdateManyWithoutSellerNestedInput
   }
 
   export type SellerUncheckedUpdateWithoutWarehouseInput = {
@@ -15937,7 +17455,9 @@ export namespace Prisma {
     code?: StringFieldUpdateOperationsInput | string
     active?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    commission_pct?: FloatFieldUpdateOperationsInput | number
     documents?: InventoryDocumentUncheckedUpdateManyWithoutSellerNestedInput
+    payouts?: CommissionPayoutUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type SellerUncheckedUpdateManyWithoutWarehouseInput = {
@@ -15946,6 +17466,7 @@ export namespace Prisma {
     code?: StringFieldUpdateOperationsInput | string
     active?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    commission_pct?: FloatFieldUpdateOperationsInput | number
   }
 
   export type InventoryDocumentLineCreateManyDocumentInput = {
@@ -16006,6 +17527,16 @@ export namespace Prisma {
     attachment_url?: string | null
   }
 
+  export type CommissionPayoutCreateManySellerInput = {
+    id?: number
+    amount: number
+    date: Date | string
+    notes?: string | null
+    month: number
+    year: number
+    created_at?: Date | string
+  }
+
   export type InventoryDocumentUpdateWithoutSellerInput = {
     doc_type?: StringFieldUpdateOperationsInput | string
     document_number?: StringFieldUpdateOperationsInput | string
@@ -16050,6 +17581,35 @@ export namespace Prisma {
     created_by?: IntFieldUpdateOperationsInput | number
     approved_by?: NullableIntFieldUpdateOperationsInput | number | null
     attachment_url?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type CommissionPayoutUpdateWithoutSellerInput = {
+    amount?: FloatFieldUpdateOperationsInput | number
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    month?: IntFieldUpdateOperationsInput | number
+    year?: IntFieldUpdateOperationsInput | number
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CommissionPayoutUncheckedUpdateWithoutSellerInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    amount?: FloatFieldUpdateOperationsInput | number
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    month?: IntFieldUpdateOperationsInput | number
+    year?: IntFieldUpdateOperationsInput | number
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CommissionPayoutUncheckedUpdateManyWithoutSellerInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    amount?: FloatFieldUpdateOperationsInput | number
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    month?: IntFieldUpdateOperationsInput | number
+    year?: IntFieldUpdateOperationsInput | number
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 
@@ -16109,6 +17669,10 @@ export namespace Prisma {
      * @deprecated Use SellerDefaultArgs instead
      */
     export type SellerArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = SellerDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use CommissionPayoutDefaultArgs instead
+     */
+    export type CommissionPayoutArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = CommissionPayoutDefaultArgs<ExtArgs>
 
   /**
    * Batch Payload for updateMany & deleteMany & createMany

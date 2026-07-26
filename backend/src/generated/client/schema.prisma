@@ -1,5 +1,5 @@
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -135,13 +135,28 @@ model AuditLog {
 }
 
 model Seller {
-  id           Int      @id @default(autoincrement())
-  name         String
-  code         String   @unique
-  warehouse_id Int
-  active       Boolean  @default(true)
-  created_at   DateTime @default(now())
+  id             Int      @id @default(autoincrement())
+  name           String
+  code           String   @unique
+  warehouse_id   Int
+  active         Boolean  @default(true)
+  created_at     DateTime @default(now())
+  commission_pct Float    @default(0)
 
   warehouse Warehouse           @relation(fields: [warehouse_id], references: [id])
   documents InventoryDocument[]
+  payouts   CommissionPayout[]
+}
+
+model CommissionPayout {
+  id         Int      @id @default(autoincrement())
+  seller_id  Int
+  amount     Float
+  date       DateTime
+  notes      String?
+  month      Int
+  year       Int
+  created_at DateTime @default(now())
+
+  seller Seller @relation(fields: [seller_id], references: [id])
 }

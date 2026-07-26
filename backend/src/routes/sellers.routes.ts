@@ -37,12 +37,13 @@ router.get('/warehouse/:warehouseId', async (req, res) => {
 // Create seller
 router.post('/', async (req, res) => {
   try {
-    const { name, code, warehouse_id } = req.body;
+    const { name, code, warehouse_id, commission_pct } = req.body;
     const seller = await prisma.seller.create({
       data: {
         name,
         code,
         warehouse_id: Number(warehouse_id),
+        commission_pct: commission_pct !== undefined ? parseFloat(commission_pct) : 0,
         active: true
       }
     });
@@ -57,13 +58,14 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
     const id = parseInt(req.params.id);
-    const { name, code, warehouse_id, active } = req.body;
+    const { name, code, warehouse_id, commission_pct, active } = req.body;
     const seller = await prisma.seller.update({
       where: { id },
       data: {
         name,
         code,
         warehouse_id: warehouse_id ? Number(warehouse_id) : undefined,
+        commission_pct: commission_pct !== undefined ? parseFloat(commission_pct) : undefined,
         active: active !== undefined ? active : undefined
       }
     });
@@ -87,4 +89,115 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+// Create a payout for a seller
+router.post('/:id/payouts', async (req, res) => {
+  try {
+    const sellerId = parseInt(req.params.id);
+    const { amount, date, notes, month, year } = req.body;
+    const payout = await prisma.commissionPayout.create({
+      data: {
+        seller_id: sellerId,
+        amount: parseFloat(amount),
+        date: new Date(date),
+        notes,
+        month: parseInt(month),
+        year: parseInt(year)
+      }
+    });
+    res.status(201).json(payout);
+  } catch (error: any) {
+    console.error('Error creating payout:', error);
+    res.status(400).json({ error: error.message || 'Error creating payout' });
+  }
+});
+
+// Get commissions and payouts report grouped by seller, year, and month
+router.get('/commissions/report', async (req, res) => {
+  try {
+    const sellers = await prisma.seller.findMany();
+    const documents = await prisma.inventoryDocument.findMany({
+      where: {
+        doc_type: 'OUT',
+        status: 'APPLIED',
+        seller_id: { not: null }
+      },
+      include: {
+        lines: true
+      }
+    });
+
+    const payouts = await prisma.commissionPayout.findMany();
+    const reportMap: { [key: string]: any } = {};
+
+    for (const doc of documents) {
+      const seller = sellers.find(s => s.id === doc.seller_id);
+      if (!seller) continue;
+
+      const date = new Date(doc.date);
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const key = `${seller.id}-${year}-${month}`;
+
+      const docSales = doc.lines.reduce((sum, line) => sum + (line.total_sale || 0), 0);
+
+      if (!reportMap[key]) {
+        reportMap[key] = {
+          seller_id: seller.id,
+          seller_name: seller.name,
+          seller_code: seller.code,
+          commission_pct: seller.commission_pct,
+          year,
+          month,
+          sales_total: 0,
+          commission_earned: 0,
+          payouts_total: 0,
+          balance: 0
+        };
+      }
+      reportMap[key].sales_total += docSales;
+    }
+
+    for (const pay of payouts) {
+      const seller = sellers.find(s => s.id === pay.seller_id);
+      if (!seller) continue;
+
+      const key = `${seller.id}-${pay.year}-${pay.month}`;
+
+      if (!reportMap[key]) {
+        reportMap[key] = {
+          seller_id: seller.id,
+          seller_name: seller.name,
+          seller_code: seller.code,
+          commission_pct: seller.commission_pct,
+          year: pay.year,
+          month: pay.month,
+          sales_total: 0,
+          commission_earned: 0,
+          payouts_total: 0,
+          balance: 0
+        };
+      }
+      reportMap[key].payouts_total += pay.amount;
+    }
+
+    const result = Object.values(reportMap).map(item => {
+      item.commission_earned = item.sales_total * (item.commission_pct / 100);
+      item.balance = item.commission_earned - item.payouts_total;
+      return item;
+    });
+
+    result.sort((a, b) => {
+      if (b.year !== a.year) return b.year - a.year;
+      if (b.month !== a.month) return b.month - a.month;
+      return a.seller_name.localeCompare(b.seller_name);
+    });
+
+    res.json(result);
+  } catch (error: any) {
+    console.error('Error generating commission report:', error);
+    res.status(500).json({ error: error.message || 'Error generating report' });
+  }
+});
+
 export default router;
+

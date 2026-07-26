@@ -141,7 +141,23 @@ model Seller {
   warehouse_id   Int
   active         Boolean  @default(true)
   created_at     DateTime @default(now())
+  commission_pct Float    @default(0)
 
   warehouse      Warehouse @relation(fields: [warehouse_id], references: [id])
   documents      InventoryDocument[]
+  payouts        CommissionPayout[]
 }
+
+model CommissionPayout {
+  id          Int      @id @default(autoincrement())
+  seller_id   Int
+  amount      Float
+  date        DateTime
+  notes       String?
+  month       Int
+  year        Int
+  created_at  DateTime @default(now())
+
+  seller      Seller   @relation(fields: [seller_id], references: [id])
+}
+

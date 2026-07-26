@@ -248,6 +248,7 @@ const WarehouseInventoryModal = ({ warehouseId, warehouses, products, onClose, o
                                 <th>Producto</th>
                                 <th>Tipo</th>
                                 <th>Presentación</th>
+                                <th>Lote</th>
                                 <th>Existencia</th>
                                 <th>Costo Promedio</th>
                                 <th>Valor Total</th>
@@ -255,13 +256,14 @@ const WarehouseInventoryModal = ({ warehouseId, warehouses, products, onClose, o
                         </thead>
                         <tbody>
                             {inventory.map((item: any) => (
-                                <tr key={item.product_id} onClick={() => onProductClick(item.product_id)} style={{ cursor: 'pointer' }}>
+                                <tr key={item.id} onClick={() => onProductClick(item.product_id)} style={{ cursor: 'pointer' }}>
                                     <td style={{ fontWeight: 600 }}>{item.product?.name}</td>
                                     <td><span className="badge" style={{ background: 'rgba(255,255,255,0.05)' }}>{item.product?.type === 'GRANO' ? 'Grano' : 'Molido'}</span></td>
                                     <td>{item.product?.presentation_g}g</td>
+                                    <td><span className="badge" style={{ background: 'rgba(198, 160, 82, 0.15)', color: '#c6a052', border: '1px solid rgba(198, 160, 82, 0.3)' }}>{item.lot || 'SIN-LOTE'}</span></td>
                                     <td style={{ fontWeight: 700, color: 'var(--primary)' }}>{item.qty_on_hand} ud</td>
-                                    <td>{new Intl.NumberFormat('es-CO').format(item.unit_cost || 0)}</td>
-                                    <td>{new Intl.NumberFormat('es-CO').format(item.value_total || 0)}</td>
+                                    <td>{new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(item.avg_cost || 0)}</td>
+                                    <td>{new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(item.value_total || 0)}</td>
                                 </tr>
                             ))}
                             {inventory.length === 0 && (
@@ -600,18 +602,25 @@ const TransactionEngine = ({ products, warehouses, sellers = [], onRefresh }: an
                     {formData.lines.map((ln, idx) => {
                         const selectedProd = products.find((p: any) => Number(p.id) === Number(ln.product_id));
                         const stats = selectedProd ? getProductStats(selectedProd, ln.lot) : { qty: 0, cost: 0, lot: '' };
+                        const productBalances = selectedProd ? (selectedProd.balances || []).filter(
+                            (b: any) => Number(b.warehouse_id) === Number(formData.warehouse_from_id) && b.qty_on_hand > 0
+                        ) : [];
 
                         return (
-                            <div key={idx} style={{display:'grid', gridTemplateColumns:'1.5fr 0.8fr 0.8fr 1fr 0.4fr', gap:'0.8rem', marginBottom:'1.5rem', borderBottom:'1px solid rgba(255,255,255,0.05)', paddingBottom:'1rem'}}>
+                            <div key={idx} style={{display:'grid', gridTemplateColumns:'1.5fr 1fr 0.8fr 1fr 0.4fr', gap:'0.8rem', marginBottom:'1.5rem', borderBottom:'1px solid rgba(255,255,255,0.05)', paddingBottom:'1rem'}}>
                                 <select value={ln.product_id||''} onChange={e=>{
                                     const pid = Number(e.target.value);
                                     const prod = products.find((p: any) => Number(p.id) === pid);
-                                    const pStats = prod ? getProductStats(prod) : { qty: 0, cost: 0, lot: '' };
+                                    const prodBalances = prod ? (prod.balances || []).filter(
+                                        (b: any) => Number(b.warehouse_id) === Number(formData.warehouse_from_id) && b.qty_on_hand > 0
+                                    ) : [];
+                                    const defaultLot = prodBalances[0] ? prodBalances[0].lot : '';
+                                    const defaultCost = prodBalances[0] ? prodBalances[0].avg_cost : 0;
                                     
                                     const nl = [...formData.lines];
                                     nl[idx].product_id = pid;
-                                    nl[idx].unit_cost = docType === 'IN' ? 0 : pStats.cost;
-                                    nl[idx].lot = docType === 'IN' ? '' : pStats.lot;
+                                    nl[idx].unit_cost = docType === 'IN' ? 0 : defaultCost;
+                                    nl[idx].lot = docType === 'IN' ? '' : defaultLot;
                                     setFormData({...formData, lines:nl});
                                 }} required>
                                     <option value="">Producto...</option>
@@ -623,8 +632,26 @@ const TransactionEngine = ({ products, warehouses, sellers = [], onRefresh }: an
                                 </select>
 
                                 <div style={{position:'relative'}}>
-                                    <input placeholder="Lote" value={ln.lot} onChange={e=>{const nl=[...formData.lines]; nl[idx].lot=e.target.value; setFormData({...formData, lines:nl})}} required readOnly={docType!=='IN'} style={{background: docType!=='IN'?'rgba(255,255,255,0.05)':''}} />
-                                    {docType!=='IN' && <small style={{position:'absolute', bottom:'-18px', left:0, fontSize:'9px', color:'var(--primary)'}}>Auto-FIFO</small>}
+                                    {docType === 'IN' ? (
+                                        <input placeholder="Lote" value={ln.lot} onChange={e=>{const nl=[...formData.lines]; nl[idx].lot=e.target.value; setFormData({...formData, lines:nl})}} required />
+                                    ) : (
+                                        <select value={ln.lot} onChange={e=>{
+                                            const selectedLot = e.target.value;
+                                            const lotBal = productBalances.find((b: any) => b.lot === selectedLot);
+                                            const nl = [...formData.lines];
+                                            nl[idx].lot = selectedLot;
+                                            nl[idx].unit_cost = lotBal ? lotBal.avg_cost : 0;
+                                            setFormData({...formData, lines:nl});
+                                        }} required style={{ width: '100%' }}>
+                                            <option value="">Lote...</option>
+                                            {productBalances.map((b: any) => (
+                                                <option key={b.id} value={b.lot}>
+                                                    {b.lot} ({b.qty_on_hand} ud)
+                                                </option>
+                                            ))}
+                                        </select>
+                                    )}
+                                    {docType!=='IN' && <small style={{position:'absolute', bottom:'-18px', left:0, fontSize:'9px', color:'var(--primary)'}}>Selección Manual</small>}
                                 </div>
                                 
                                 <div style={{position:'relative'}}>
@@ -729,20 +756,21 @@ const ProductDetailModal = ({ productId, onClose }: any) => {
                     <button className="btn btn-outline" onClick={onClose}>✕</button>
                 </div>
 
-                <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'1.5rem', marginTop:'1.5rem'}}>
+                <div style={{display:'grid', gridTemplateColumns:'1.4fr 0.8fr', gap:'1.5rem', marginTop:'1.5rem'}}>
                     <div className="glass-card" style={{background:'rgba(0,0,0,0.2)'}}>
-                        <h4 style={{marginBottom:'1rem', color:'var(--primary)'}}>Saldos Actuales por Bodega</h4>
+                        <h4 style={{marginBottom:'1rem', color:'var(--primary)'}}>Saldos Actuales por Bodega y Lote</h4>
                         <table>
-                            <thead><tr><th>Bodega</th><th>Stock</th><th>Valor Total</th></tr></thead>
+                            <thead><tr><th>Bodega</th><th>Lote</th><th>Stock</th><th>Valor Total</th></tr></thead>
                             <tbody>
                                 {p.balances?.map((b:any)=>(
-                                    <tr key={b.warehouse_id}>
+                                    <tr key={b.id}>
                                         <td><div style={{display:'flex', alignItems:'center', gap:'8px'}}><div style={{width:'8px', height:'8px', borderRadius:'50%', background:b.warehouse?.color}} />{b.warehouse?.name}</div></td>
+                                        <td><span className="badge" style={{ background: 'rgba(255,255,255,0.05)' }}>{b.lot || 'SIN-LOTE'}</span></td>
                                         <td style={{fontWeight:600}}>{b.qty_on_hand} unidades</td>
                                         <td>{new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(b.value_total)}</td>
                                     </tr>
                                 ))}
-                                {(!p.balances || p.balances.length === 0) && <tr><td colSpan={3} style={{textAlign:'center', opacity:0.5}}>Sin existencias registradas</td></tr>}
+                                {(!p.balances || p.balances.length === 0) && <tr><td colSpan={4} style={{textAlign:'center', opacity:0.5}}>Sin existencias registradas</td></tr>}
                             </tbody>
                         </table>
                     </div>
@@ -750,28 +778,43 @@ const ProductDetailModal = ({ productId, onClose }: any) => {
                     <div className="glass-card" style={{background:'rgba(0,0,0,0.2)'}}>
                         <h4 style={{marginBottom:'1rem', color:'var(--primary)'}}>Resumen de Costos</h4>
                         <div style={{display:'flex', flexDirection:'column', gap:'1rem'}}>
-                            <div style={{display:'flex', justifyContent:'space-between'}}><span>Costo Promedio (Global)</span><strong style={{color:'var(--primary)'}}>{new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' }).format(p.balances?.[0]?.avg_cost || 0)}</strong></div>
+                            <div style={{display:'flex', justifyContent:'space-between'}}>
+                                <span>Costo Promedio (Global)</span>
+                                <strong style={{color:'var(--primary)'}}>
+                                    {new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(
+                                        (() => {
+                                            const totalQty = p.balances?.reduce((acc: number, b: any) => acc + b.qty_on_hand, 0) || 0;
+                                            const totalVal = p.balances?.reduce((acc: number, b: any) => acc + b.value_total, 0) || 0;
+                                            return totalQty > 0 ? totalVal / totalQty : 0;
+                                        })()
+                                    )}
+                                </strong>
+                            </div>
                             <div style={{display:'flex', justifyContent:'space-between'}}><span>Último Movimiento</span><span>{p.ledger?.[0] ? new Date(p.ledger[0].timestamp).toLocaleDateString() : 'N/A'}</span></div>
                         </div>
                     </div>
                 </div>
 
                 <div style={{marginTop:'1.5rem'}}>
-                    <h4 style={{marginBottom:'1rem', color:'var(--primary)'}}>Historial de Movimientos (Kardex)</h4>
+                    <h4 style={{marginBottom:'1rem', color:'var(--primary)'}}>Historial de Movimientos (Kardex por Lote)</h4>
                     <div className="glass-card" style={{padding:'0', background:'rgba(0,0,0,0.1)'}}>
                         <table>
-                            <thead><tr><th>Fecha</th><th>Tipo</th><th>Bodega</th><th>Cant.</th><th>N° Doc</th></tr></thead>
+                            <thead><tr><th>Fecha</th><th>Tipo</th><th>Bodega</th><th>Lote</th><th>Cant.</th><th>Costo Unit.</th><th>N° Doc</th></tr></thead>
                             <tbody>
                                 {p.ledger?.map((l:any)=>(
                                     <tr key={l.id}>
                                         <td>{new Date(l.timestamp).toLocaleString()}</td>
-                                        <td><span className={`badge ${l.direction === 'IN' ? 'badge-in' : 'badge-out'}`}>{l.direction === 'IN' ? 'Entrada' : 'Salida'}</span></td>
-                                        <td>{l.warehouse?.name}</td>
-                                        <td style={{fontWeight:600, color: l.direction === 'IN' ? 'var(--success)' : 'var(--danger)'}}>{l.direction === 'IN' ? '+' : '-'}{l.qty_change} unidades</td>
+                                        <td><span className={`badge ${l.movement_type === 'IN' ? 'badge-in' : 'badge-out'}`}>{l.movement_type === 'IN' ? 'Entrada' : 'Salida'}</span></td>
+                                        <td>{l.warehouse?.name || 'N/A'}</td>
+                                        <td><span className="badge" style={{ background: 'rgba(255,255,255,0.05)' }}>{l.lot || 'SIN-LOTE'}</span></td>
+                                        <td style={{fontWeight:600, color: l.movement_type === 'IN' ? 'var(--success)' : 'var(--danger)'}}>
+                                            {l.movement_type === 'IN' ? '+' : '-'}{l.movement_type === 'IN' ? l.qty_in : l.qty_out} unidades
+                                        </td>
+                                        <td>{new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(l.unit_cost || 0)}</td>
                                         <td><small style={{opacity:0.6}}>{l.document?.document_number || 'Ajuste Manual'}</small></td>
                                     </tr>
                                 ))}
-                                {(!p.ledger || p.ledger.length === 0) && <tr><td colSpan={5} style={{textAlign:'center', opacity:0.5}}>No hay movimientos registrados</td></tr>}
+                                {(!p.ledger || p.ledger.length === 0) && <tr><td colSpan={7} style={{textAlign:'center', opacity:0.5}}>No hay movimientos registrados</td></tr>}
                             </tbody>
                         </table>
                     </div>
@@ -1015,7 +1058,26 @@ const SalesReport = ({ sellers = [], onProductClick }: any) => {
 const SellerManager = ({ sellers, warehouses, onRefresh }: any) => {
     const [showAdd, setShowAdd] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
-    const [formData, setFormData] = useState({ name: '', code: '', warehouse_id: '' });
+    const [formData, setFormData] = useState({ name: '', code: '', warehouse_id: '', commission_pct: '0' });
+    
+    // States for commission control
+    const [reportData, setReportData] = useState<any[]>([]);
+    const [loadingReport, setLoadingReport] = useState(true);
+    const [showPayModal, setShowPayModal] = useState(false);
+    const [payForm, setPayForm] = useState({ seller_id: 0, seller_name: '', amount: 0, notes: '', month: 0, year: 0, date: new Date().toISOString().split('T')[0] });
+
+    const fetchReport = async () => {
+        setLoadingReport(true);
+        try {
+            const res = await fetch(`${API_URL}/sellers/commissions/report`);
+            if (res.ok) setReportData(await res.json());
+        } catch (e) { console.error(e); }
+        setLoadingReport(false);
+    };
+
+    useEffect(() => {
+        fetchReport();
+    }, [sellers]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -1028,7 +1090,8 @@ const SellerManager = ({ sellers, warehouses, onRefresh }: any) => {
                 body: JSON.stringify({
                     name: formData.name,
                     code: formData.code,
-                    warehouse_id: parseInt(formData.warehouse_id)
+                    warehouse_id: parseInt(formData.warehouse_id),
+                    commission_pct: parseFloat(formData.commission_pct) || 0
                 }) 
             });
             if (!res.ok) {
@@ -1049,6 +1112,50 @@ const SellerManager = ({ sellers, warehouses, onRefresh }: any) => {
         } catch (err: any) { alert(err.message); }
     };
 
+    const handlePaySubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            const res = await fetch(`${API_URL}/sellers/${payForm.seller_id}/payouts`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    amount: payForm.amount,
+                    date: payForm.date,
+                    notes: payForm.notes,
+                    month: payForm.month,
+                    year: payForm.year
+                })
+            });
+            if (!res.ok) throw new Error('Error al registrar el pago de comisión');
+            setShowPayModal(false);
+            fetchReport();
+            alert('✅ Pago de comisión registrado con éxito.');
+        } catch (err: any) { alert(err.message); }
+    };
+
+    // Calculate monthly summary for the chart
+    const monthlySummary = useMemo(() => {
+        const summary: { [key: string]: { label: string, earned: number, paid: number } } = {};
+        reportData.forEach(item => {
+            const key = `${item.year}-${item.month}`;
+            const label = `${item.month}/${item.year}`;
+            if (!summary[key]) {
+                summary[key] = { label, earned: 0, paid: 0 };
+            }
+            summary[key].earned += item.commission_earned;
+            summary[key].paid += item.payouts_total;
+        });
+        return Object.values(summary).sort((a,b) => {
+            const [am, ay] = a.label.split('/').map(Number);
+            const [bm, by] = b.label.split('/').map(Number);
+            return ay !== by ? ay - by : am - bm;
+        });
+    }, [reportData]);
+
+    const maxVal = useMemo(() => {
+        return Math.max(...monthlySummary.map(s => Math.max(s.earned, s.paid)), 1000);
+    }, [monthlySummary]);
+
     return (
         <div className="view">
             <div className="header">
@@ -1056,19 +1163,20 @@ const SellerManager = ({ sellers, warehouses, onRefresh }: any) => {
                 <button className="btn btn-primary" onClick={() => { 
                     setShowAdd(true); 
                     setEditingId(null); 
-                    setFormData({name:'', code:'', warehouse_id:''}); 
+                    setFormData({name:'', code:'', warehouse_id:'', commission_pct: '0'}); 
                 }}>+ Nuevo Vendedor</button>
             </div>
             {showAdd && (
                 <div className="glass-card" style={{marginBottom:'2rem'}}>
-                    <form onSubmit={handleSubmit} style={{display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:'1rem'}}>
+                    <form onSubmit={handleSubmit} style={{display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:'1rem'}}>
                         <input placeholder="Nombre Completo" value={formData.name} onChange={e => setFormData({...formData, name:e.target.value})} required />
                         <input placeholder="Código / ID Vendedor" value={formData.code} onChange={e => setFormData({...formData, code:e.target.value})} required />
                         <select value={formData.warehouse_id} onChange={e => setFormData({...formData, warehouse_id:e.target.value})} required>
                             <option value="">Asignar Bodega...</option>
                             {warehouses.filter((w:any)=>w.active).map((w:any)=><option key={w.id} value={w.id}>{w.name}</option>)}
                         </select>
-                        <div style={{gridColumn:'span 3', display:'flex', gap:'10px', justifyContent:'flex-end'}}>
+                        <input type="number" step="any" min="0" max="100" placeholder="% Comisión" value={formData.commission_pct} onChange={e => setFormData({...formData, commission_pct:e.target.value})} required />
+                        <div style={{gridColumn:'span 4', display:'flex', gap:'10px', justifyContent:'flex-end'}}>
                             <button type="button" className="btn btn-outline" onClick={() => setShowAdd(false)}>Cancelar</button>
                             <button type="submit" className="btn btn-primary">Guardar Vendedor</button>
                         </div>
@@ -1081,6 +1189,7 @@ const SellerManager = ({ sellers, warehouses, onRefresh }: any) => {
                         <th>Código</th>
                         <th>Nombre</th>
                         <th>Bodega Asignada</th>
+                        <th>% Comisión</th>
                         <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
@@ -1095,6 +1204,7 @@ const SellerManager = ({ sellers, warehouses, onRefresh }: any) => {
                                     {s.warehouse?.name || 'No asignada'}
                                 </span>
                             </td>
+                            <td style={{ fontWeight: 600, color: 'var(--primary)' }}>{s.commission_pct || 0}%</td>
                             <td>
                                 <span className={`badge ${s.active ? 'badge-in' : 'badge-out'}`}>
                                     {s.active ? 'Activo' : 'Inactivo'}
@@ -1104,7 +1214,7 @@ const SellerManager = ({ sellers, warehouses, onRefresh }: any) => {
                                 <div style={{display:'flex', gap:'10px'}}>
                                     <button className="btn btn-outline" style={{padding:'4px 10px', fontSize:'0.75rem'}} onClick={() => { 
                                         setEditingId(s.id); 
-                                        setFormData({name:s.name, code:s.code, warehouse_id:String(s.warehouse_id)}); 
+                                        setFormData({name:s.name, code:s.code, warehouse_id:String(s.warehouse_id), commission_pct: String(s.commission_pct || 0)}); 
                                         setShowAdd(true); 
                                     }}>Editar</button>
                                     {s.active && (
@@ -1116,11 +1226,210 @@ const SellerManager = ({ sellers, warehouses, onRefresh }: any) => {
                     ))}
                     {sellers.length === 0 && (
                         <tr>
-                            <td colSpan={5} style={{textAlign:'center', padding:'2rem', opacity:0.5}}>No hay vendedores registrados.</td>
+                            <td colSpan={6} style={{textAlign:'center', padding:'2rem', opacity:0.5}}>No hay vendedores registrados.</td>
                         </tr>
                     )}
                 </tbody>
             </table>
+
+            {/* Commissions vs Payments Analytics */}
+            <div className="glass-card" style={{ marginTop: '3rem' }}>
+                <h3 style={{ color: 'var(--primary)', marginBottom: '1.2rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    📊 Analítica: Comisiones Devengadas (Púrpura) vs. Pagos de Comisión (Verde)
+                </h3>
+                {monthlySummary.length === 0 ? (
+                    <div style={{ padding: '2.5rem', textAlign: 'center', opacity: 0.5 }}>No hay datos suficientes para mostrar analíticas en este periodo.</div>
+                ) : (
+                    <div>
+                        <div style={{ height: '180px', display: 'flex', alignItems: 'flex-end', gap: '24px', padding: '15px 0 5px 0', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                            {monthlySummary.map((d, idx) => (
+                                <div key={idx} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%' }}>
+                                    <div style={{ display: 'flex', gap: '5px', alignItems: 'flex-end', height: '80%', width: '100%', justifyContent: 'center' }}>
+                                        {/* Commission Bar (Purple) */}
+                                        <div 
+                                            style={{ 
+                                                width: '26px', 
+                                                height: `${(d.earned / maxVal) * 80}%`, 
+                                                background: '#8b5cf6', 
+                                                borderRadius: '4px 4px 0 0', 
+                                                boxShadow: '0 0 10px rgba(139, 92, 246, 0.4)',
+                                                transition: 'height 0.3s ease'
+                                            }} 
+                                            title={`Comisiones: ${new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(d.earned)}`}
+                                        />
+                                        {/* Payout Bar (Green) */}
+                                        <div 
+                                            style={{ 
+                                                width: '26px', 
+                                                height: `${(d.paid / maxVal) * 80}%`, 
+                                                background: 'var(--success)', 
+                                                borderRadius: '4px 4px 0 0', 
+                                                boxShadow: '0 0 10px rgba(16, 185, 129, 0.4)',
+                                                transition: 'height 0.3s ease'
+                                            }} 
+                                            title={`Pagos: ${new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(d.paid)}`}
+                                        />
+                                    </div>
+                                    <span style={{ fontSize: '0.75rem', marginTop: '6px', color: 'var(--text-muted)', fontWeight: 600 }}>{d.label}</span>
+                                </div>
+                            ))}
+                        </div>
+                        <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center', marginTop: '1.2rem', fontSize: '0.8rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <div style={{ width: '12px', height: '12px', background: '#8b5cf6', borderRadius: '3px' }} />
+                                <span style={{ opacity: 0.9 }}>Comisiones Devengadas</span>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <div style={{ width: '12px', height: '12px', background: 'var(--success)', borderRadius: '3px' }} />
+                                <span style={{ opacity: 0.9 }}>Pagos Realizados (Salidas de Dinero)</span>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            {/* Balances and Payouts Control */}
+            <div className="glass-card" style={{ marginTop: '2rem' }}>
+                <h3 style={{ color: 'var(--primary)', marginBottom: '1.2rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    💰 Control de Saldos de Comisión por Vendedor y Periodo
+                </h3>
+                <div style={{ overflowX: 'auto', padding: 0 }}>
+                    {loadingReport ? (
+                        <div style={{ padding: '2rem', textAlign: 'center', opacity: 0.5 }}>Cargando reporte de comisiones...</div>
+                    ) : (
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Periodo</th>
+                                    <th>Vendedor</th>
+                                    <th style={{ textAlign: 'right' }}>Ventas del Mes</th>
+                                    <th style={{ textAlign: 'center' }}>% Com.</th>
+                                    <th style={{ textAlign: 'right' }}>Comisión Devengada</th>
+                                    <th style={{ textAlign: 'right' }}>Pagado</th>
+                                    <th style={{ textAlign: 'right' }}>Saldo Pendiente</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {reportData.map((item, idx) => (
+                                    <tr key={idx}>
+                                        <td style={{ fontWeight: 600 }}>{item.month}/{item.year}</td>
+                                        <td>
+                                            <div style={{ fontWeight: 600 }}>{item.seller_name}</div>
+                                            <small style={{ opacity: 0.6 }}>{item.seller_code}</small>
+                                        </td>
+                                        <td style={{ textAlign: 'right', fontWeight: 600 }}>
+                                            {new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(item.sales_total)}
+                                        </td>
+                                        <td style={{ textAlign: 'center' }}>{item.commission_pct}%</td>
+                                        <td style={{ textAlign: 'right', fontWeight: 600, color: 'var(--info)' }}>
+                                            {new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(item.commission_earned)}
+                                        </td>
+                                        <td style={{ textAlign: 'right', color: 'var(--success)', fontWeight: 600 }}>
+                                            {new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(item.payouts_total)}
+                                        </td>
+                                        <td style={{ textAlign: 'right', fontWeight: 700, color: item.balance > 0 ? 'var(--warning)' : 'inherit' }}>
+                                            {new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(item.balance)}
+                                        </td>
+                                        <td>
+                                            {item.balance > 0 ? (
+                                                <button 
+                                                    className="btn btn-primary" 
+                                                    style={{ padding: '5px 12px', fontSize: '0.75rem' }}
+                                                    onClick={() => {
+                                                        setPayForm({
+                                                            seller_id: item.seller_id,
+                                                            seller_name: item.seller_name,
+                                                            amount: item.balance,
+                                                            notes: `Pago comisión ${item.month}/${item.year}`,
+                                                            month: item.month,
+                                                            year: item.year,
+                                                            date: new Date().toISOString().split('T')[0]
+                                                        });
+                                                        setShowPayModal(true);
+                                                    }}
+                                                >
+                                                    💵 Pagar Comisión
+                                                </button>
+                                            ) : (
+                                                <span style={{ fontSize: '0.75rem', opacity: 0.5, fontStyle: 'italic' }}>✅ Al día</span>
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))}
+                                {reportData.length === 0 && (
+                                    <tr>
+                                        <td colSpan={8} style={{ textAlign: 'center', padding: '2.5rem', opacity: 0.5 }}>
+                                            No se han registrado ventas con vendedor asignado para calcular comisiones.
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    )}
+                </div>
+            </div>
+
+            {/* Payout Modal Form */}
+            {showPayModal && (
+                <div className="modal-overlay" onClick={() => setShowPayModal(false)}>
+                    <div className="modal-content glass-card" onClick={e => e.stopPropagation()} style={{ maxWidth: '500px', width: '90%' }}>
+                        <div className="header" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '1rem', marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between' }}>
+                            <h2 style={{ margin: 0 }}>💵 Registrar Pago (Salida de Dinero)</h2>
+                            <button className="btn btn-outline" style={{ padding: '2px 8px' }} onClick={() => setShowPayModal(false)}>✕</button>
+                        </div>
+                        <form onSubmit={handlePaySubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+                            <div>
+                                <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Vendedor:</label>
+                                <div style={{ fontSize: '1.15rem', fontWeight: 600, color: 'var(--primary)' }}>{payForm.seller_name}</div>
+                            </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                <div>
+                                    <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Periodo Correspondiente:</label>
+                                    <div style={{ fontWeight: 600 }}>{payForm.month}/{payForm.year}</div>
+                                </div>
+                                <div>
+                                    <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Fecha de Registro:</label>
+                                    <input 
+                                        type="date" 
+                                        value={payForm.date} 
+                                        onChange={e => setPayForm({ ...payForm, date: e.target.value })} 
+                                        required 
+                                        style={{ width: '100%', padding: '6px' }}
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px' }}>Monto a Pagar (COP):</label>
+                                <input 
+                                    type="number" 
+                                    step="any" 
+                                    value={payForm.amount} 
+                                    onChange={e => setPayForm({ ...payForm, amount: parseFloat(e.target.value) || 0 })} 
+                                    required 
+                                    min="1"
+                                    max={payForm.amount} // Cannot pay more than balance
+                                    style={{ width: '100%', padding: '10px' }}
+                                />
+                                <small style={{ color: 'var(--text-muted)' }}>Monto sugerido/pendiente: {new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(payForm.amount)}</small>
+                            </div>
+                            <div>
+                                <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px' }}>Notas / Observación:</label>
+                                <textarea 
+                                    value={payForm.notes} 
+                                    onChange={e => setPayForm({ ...payForm, notes: e.target.value })} 
+                                    placeholder="Ingrese comprobante, método de pago, etc."
+                                    style={{ width: '100%', height: '70px', background: 'rgba(255,255,255,0.05)', color: 'var(--text)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '10px' }}
+                                />
+                            </div>
+                            <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '1rem' }}>
+                                <button type="button" className="btn btn-outline" onClick={() => setShowPayModal(false)}>Cancelar</button>
+                                <button type="submit" className="btn btn-primary">Confirmar Pago</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

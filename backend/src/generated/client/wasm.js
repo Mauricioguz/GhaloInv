@@ -116,9 +116,6 @@ Prisma.NullTypes = {
  */
 
 exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
-  ReadUncommitted: 'ReadUncommitted',
-  ReadCommitted: 'ReadCommitted',
-  RepeatableRead: 'RepeatableRead',
   Serializable: 'Serializable'
 });
 
@@ -229,17 +226,24 @@ exports.Prisma.SellerScalarFieldEnum = {
   code: 'code',
   warehouse_id: 'warehouse_id',
   active: 'active',
+  created_at: 'created_at',
+  commission_pct: 'commission_pct'
+};
+
+exports.Prisma.CommissionPayoutScalarFieldEnum = {
+  id: 'id',
+  seller_id: 'seller_id',
+  amount: 'amount',
+  date: 'date',
+  notes: 'notes',
+  month: 'month',
+  year: 'year',
   created_at: 'created_at'
 };
 
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
-};
-
-exports.Prisma.QueryMode = {
-  default: 'default',
-  insensitive: 'insensitive'
 };
 
 exports.Prisma.NullsOrder = {
@@ -257,7 +261,8 @@ exports.Prisma.ModelName = {
   InventoryDocumentLine: 'InventoryDocumentLine',
   InventoryLedger: 'InventoryLedger',
   AuditLog: 'AuditLog',
-  Seller: 'Seller'
+  Seller: 'Seller',
+  CommissionPayout: 'CommissionPayout'
 };
 
 /**

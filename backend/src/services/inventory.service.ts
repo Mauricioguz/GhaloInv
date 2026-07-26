@@ -128,21 +128,9 @@ export class InventoryService {
   private async processExit(tx: any, doc: any, line: any) {
     let lotToUse = line.lot;
 
-    // Si no viene lote, buscar el lote más antiguo con existencias (FIFO)
+    // Quitar FIFO: Exigir que se especifique un lote para salidas
     if (!lotToUse) {
-      const fifoLot = await tx.inventoryBalance.findFirst({
-        where: {
-          product_id: line.product_id,
-          warehouse_id: doc.warehouse_from_id,
-          qty_on_hand: { gt: 0 }
-        },
-        orderBy: { updated_at: 'asc' }
-      });
-
-      if (!fifoLot) {
-        throw new Error(`No hay existencias disponibles para el producto ID ${line.product_id} en la bodega seleccionada.`);
-      }
-      lotToUse = fifoLot.lot;
+      throw new Error(`Debe especificar un lote para el producto ID ${line.product_id} en la bodega de origen.`);
     }
 
     // Buscar saldo actual por lote
