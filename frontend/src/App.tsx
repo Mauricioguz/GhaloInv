@@ -404,6 +404,24 @@ const TransactionEngine = ({ products, warehouses, sellers = [], onRefresh }: an
     const [loadingNum, setLoadingNum] = useState(false);
     const [correctingDocId, setCorrectingDocId] = useState<number | null>(null);
     const [history, setHistory] = useState<any[]>([]);
+    const [filterWarehouseId, setFilterWarehouseId] = useState<number | string>('');
+    const [filterSellerId, setFilterSellerId] = useState<number | string>('');
+
+    const filteredHistory = useMemo(() => {
+        return history.filter((doc: any) => {
+            if (filterWarehouseId !== '') {
+                const whId = Number(filterWarehouseId);
+                const matchFrom = Number(doc.warehouse_from_id) === whId;
+                const matchTo = Number(doc.warehouse_to_id) === whId;
+                if (!matchFrom && !matchTo) return false;
+            }
+            if (filterSellerId !== '') {
+                const selId = Number(filterSellerId);
+                if (Number(doc.seller_id) !== selId) return false;
+            }
+            return true;
+        });
+    }, [history, filterWarehouseId, filterSellerId]);
 
     const fetchNextNumber = async (type: string) => {
         setLoadingNum(true);
@@ -697,7 +715,40 @@ const TransactionEngine = ({ products, warehouses, sellers = [], onRefresh }: an
             </form>
 
             <div style={{marginTop:'3rem'}}>
-                <h2 style={{color:'var(--primary)', marginBottom:'1rem'}}>Movimientos Recientes</h2>
+                <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:'1rem', marginBottom:'1.2rem'}}>
+                    <h2 style={{color:'var(--primary)', margin:0}}>Movimientos Recientes</h2>
+                    <div style={{display:'flex', gap:'12px', flexWrap:'wrap', alignItems:'center'}}>
+                        <select 
+                            value={filterWarehouseId} 
+                            onChange={e => setFilterWarehouseId(e.target.value)} 
+                            style={{width:'auto', padding:'6px 12px', fontSize:'0.8rem', marginBottom:0}}
+                        >
+                            <option value="">Todas las Bodegas</option>
+                            {warehouses.map((w: any) => (
+                                <option key={w.id} value={w.id}>{w.name}</option>
+                            ))}
+                        </select>
+                        <select 
+                            value={filterSellerId} 
+                            onChange={e => setFilterSellerId(e.target.value)} 
+                            style={{width:'auto', padding:'6px 12px', fontSize:'0.8rem', marginBottom:0}}
+                        >
+                            <option value="">Todos los Vendedores</option>
+                            {sellers.map((s: any) => (
+                                <option key={s.id} value={s.id}>{s.name} [{s.code}]</option>
+                            ))}
+                        </select>
+                        {(filterWarehouseId !== '' || filterSellerId !== '') && (
+                            <button 
+                                className="btn btn-outline" 
+                                style={{padding:'6px 12px', fontSize:'0.75rem'}} 
+                                onClick={() => { setFilterWarehouseId(''); setFilterSellerId(''); }}
+                            >
+                                Limpiar Filtros
+                            </button>
+                        )}
+                    </div>
+                </div>
                 <div className="glass-card" style={{padding:'0', maxHeight:'450px', overflowY:'auto', border:'1px solid rgba(255,255,255,0.05)'}}>
                     <table style={{width:'100%', borderCollapse:'collapse'}}>
                         <thead style={{position:'sticky', top:0, background:'var(--bg-card)', zIndex:1, boxShadow:'0 1px 0 rgba(255,255,255,0.1)'}}>
@@ -713,7 +764,7 @@ const TransactionEngine = ({ products, warehouses, sellers = [], onRefresh }: an
                             </tr>
                         </thead>
                         <tbody>
-                            {history.slice(0, 50).map((doc: any) => (
+                            {filteredHistory.slice(0, 50).map((doc: any) => (
                                 <tr key={doc.id}>
                                     <td>{new Date(doc.date).toLocaleDateString()}</td>
                                     <td style={{fontWeight:600}}>{doc.document_number}</td>
