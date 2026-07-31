@@ -1058,21 +1058,28 @@ const SalesReport = ({ sellers = [], onProductClick }: any) => {
 const SellerManager = ({ sellers, warehouses, onRefresh }: any) => {
     const [showAdd, setShowAdd] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
-    const [formData, setFormData] = useState({ name: '', code: '', warehouse_id: '', commission_pct: '0' });
+    const [formData, setFormData] = useState({ name: '', code: '', warehouse_id: '', commission_pct: '100' });
     
     // States for commission control
     const [reportData, setReportData] = useState<any[]>([]);
     const [loadingReport, setLoadingReport] = useState(true);
+    const [detailsData, setDetailsData] = useState<any[]>([]);
+    const [loadingDetails, setLoadingDetails] = useState(true);
     const [showPayModal, setShowPayModal] = useState(false);
     const [payForm, setPayForm] = useState({ seller_id: 0, seller_name: '', amount: 0, notes: '', month: 0, year: 0, date: new Date().toISOString().split('T')[0] });
 
     const fetchReport = async () => {
         setLoadingReport(true);
+        setLoadingDetails(true);
         try {
             const res = await fetch(`${API_URL}/sellers/commissions/report`);
             if (res.ok) setReportData(await res.json());
+            
+            const resDet = await fetch(`${API_URL}/sellers/commissions/details`);
+            if (resDet.ok) setDetailsData(await resDet.json());
         } catch (e) { console.error(e); }
         setLoadingReport(false);
+        setLoadingDetails(false);
     };
 
     useEffect(() => {
@@ -1375,6 +1382,65 @@ const SellerManager = ({ sellers, warehouses, onRefresh }: any) => {
                                     <tr>
                                         <td colSpan={8} style={{ textAlign: 'center', padding: '2.5rem', opacity: 0.5 }}>
                                             No se han registrado ventas con vendedor asignado para calcular comisiones.
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    )}
+                </div>
+            </div>
+
+            {/* Detalle de Comisiones por Venta (Fechas) */}
+            <div className="glass-card" style={{ marginTop: '2rem' }}>
+                <h3 style={{ color: 'var(--primary)', marginBottom: '1.2rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    📅 Detalle de Comisiones por Fecha y Venta (Vendido vs. Costo)
+                </h3>
+                <div style={{ overflowX: 'auto', padding: 0 }}>
+                    {loadingDetails ? (
+                        <div style={{ padding: '2rem', textAlign: 'center', opacity: 0.5 }}>Cargando detalle de ventas...</div>
+                    ) : (
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>N° Documento</th>
+                                    <th>Vendedor</th>
+                                    <th style={{ textAlign: 'right' }}>Valor Vendido</th>
+                                    <th style={{ textAlign: 'right' }}>Costo Inventario</th>
+                                    <th style={{ textAlign: 'right' }}>Diferencia / Utilidad</th>
+                                    <th style={{ textAlign: 'center' }}>% Com.</th>
+                                    <th style={{ textAlign: 'right' }}>Comisión Devengada</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {detailsData.map((item, idx) => (
+                                    <tr key={idx} style={{ opacity: item.utility > 0 ? 1 : 0.65 }}>
+                                        <td>{new Date(item.date).toLocaleDateString()}</td>
+                                        <td><small style={{ fontWeight: 600 }}>{item.document_number}</small></td>
+                                        <td>
+                                            <div style={{ fontWeight: 600 }}>{item.seller_name}</div>
+                                            <small style={{ opacity: 0.6 }}>{item.seller_code}</small>
+                                        </td>
+                                        <td style={{ textAlign: 'right', fontWeight: 600 }}>
+                                            {new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(item.sales_total)}
+                                        </td>
+                                        <td style={{ textAlign: 'right', color: '#e06c75' }}>
+                                            {new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(item.cost_total)}
+                                        </td>
+                                        <td style={{ textAlign: 'right', fontWeight: 600, color: item.utility > 0 ? 'var(--success)' : 'inherit' }}>
+                                            {new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(item.utility)}
+                                        </td>
+                                        <td style={{ textAlign: 'center' }}>{item.commission_pct}%</td>
+                                        <td style={{ textAlign: 'right', fontWeight: 700, color: item.commission_earned > 0 ? 'var(--info)' : 'inherit' }}>
+                                            {new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(item.commission_earned)}
+                                        </td>
+                                    </tr>
+                                ))}
+                                {detailsData.length === 0 && (
+                                    <tr>
+                                        <td colSpan={8} style={{ textAlign: 'center', padding: '2.5rem', opacity: 0.5 }}>
+                                            No hay salidas de inventario aplicadas para mostrar detalle de comisiones.
                                         </td>
                                     </tr>
                                 )}

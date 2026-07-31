@@ -112,6 +112,7 @@ router.post('/:id/payouts', async (req, res) => {
 });
 
 // Get commissions and payouts report grouped by seller, year, and month
+// Get commissions and payouts report grouped by seller, year, and month
 router.get('/commissions/report', async (req, res) => {
   try {
     const sellers = await prisma.seller.findMany();
@@ -139,6 +140,9 @@ router.get('/commissions/report', async (req, res) => {
       const key = `${seller.id}-${year}-${month}`;
 
       const docSales = doc.lines.reduce((sum, line) => sum + (line.total_sale || 0), 0);
+      const docCost = doc.lines.reduce((sum, line) => sum + (line.total_cost || 0), 0);
+      const docUtility = docSales - docCost;
+      const docCommission = docUtility > 0 ? docUtility * (seller.commission_pct / 100) : 0;
 
       if (!reportMap[key]) {
         reportMap[key] = {
@@ -149,12 +153,15 @@ router.get('/commissions/report', async (req, res) => {
           year,
           month,
           sales_total: 0,
+          cost_total: 0,
           commission_earned: 0,
           payouts_total: 0,
           balance: 0
         };
       }
       reportMap[key].sales_total += docSales;
+      reportMap[key].cost_total += docCost;
+      reportMap[key].commission_earned += docCommission;
     }
 
     for (const pay of payouts) {
@@ -172,6 +179,7 @@ router.get('/commissions/report', async (req, res) => {
           year: pay.year,
           month: pay.month,
           sales_total: 0,
+          cost_total: 0,
           commission_earned: 0,
           payouts_total: 0,
           balance: 0
@@ -181,7 +189,6 @@ router.get('/commissions/report', async (req, res) => {
     }
 
     const result = Object.values(reportMap).map(item => {
-      item.commission_earned = item.sales_total * (item.commission_pct / 100);
       item.balance = item.commission_earned - item.payouts_total;
       return item;
     });
@@ -196,6 +203,53 @@ router.get('/commissions/report', async (req, res) => {
   } catch (error: any) {
     console.error('Error generating commission report:', error);
     res.status(500).json({ error: error.message || 'Error generating report' });
+  }
+});
+
+// Get detailed commission list sorted by date/document
+router.get('/commissions/details', async (req, res) => {
+  try {
+    const documents = await prisma.inventoryDocument.findMany({
+      where: {
+        doc_type: 'OUT',
+        status: 'APPLIED',
+        seller_id: { not: null }
+      },
+      include: {
+        lines: true,
+        seller: true
+      },
+      orderBy: { date: 'desc' }
+    });
+
+    const result = documents.map(doc => {
+      const seller = doc.seller;
+      if (!seller) return null;
+
+      const sales_total = doc.lines.reduce((sum, line) => sum + (line.total_sale || 0), 0);
+      const cost_total = doc.lines.reduce((sum, line) => sum + (line.total_cost || 0), 0);
+      const utility = sales_total - cost_total;
+      const commission_earned = utility > 0 ? utility * (seller.commission_pct / 100) : 0;
+
+      return {
+        document_id: doc.id,
+        document_number: doc.document_number,
+        date: doc.date,
+        seller_id: seller.id,
+        seller_name: seller.name,
+        seller_code: seller.code,
+        commission_pct: seller.commission_pct,
+        sales_total,
+        cost_total,
+        utility,
+        commission_earned
+      };
+    }).filter(Boolean);
+
+    res.json(result);
+  } catch (error: any) {
+    console.error('Error generating detailed commission report:', error);
+    res.status(500).json({ error: error.message || 'Error generating detailed report' });
   }
 });
 

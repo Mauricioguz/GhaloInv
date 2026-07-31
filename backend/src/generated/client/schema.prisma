@@ -141,7 +141,7 @@ model Seller {
   warehouse_id   Int
   active         Boolean  @default(true)
   created_at     DateTime @default(now())
-  commission_pct Float    @default(0)
+  commission_pct Float    @default(100)
 
   warehouse Warehouse           @relation(fields: [warehouse_id], references: [id])
   documents InventoryDocument[]
