@@ -695,23 +695,52 @@ const TransactionEngine = ({ products, warehouses, sellers = [], onRefresh }: an
 
             <div style={{marginTop:'3rem'}}>
                 <h2 style={{color:'var(--primary)', marginBottom:'1rem'}}>Movimientos Recientes</h2>
-                <div className="glass-card" style={{padding:'0'}}>
-                    <table>
-                        <thead>
+                <div className="glass-card" style={{padding:'0', maxHeight:'450px', overflowY:'auto', border:'1px solid rgba(255,255,255,0.05)'}}>
+                    <table style={{width:'100%', borderCollapse:'collapse'}}>
+                        <thead style={{position:'sticky', top:0, background:'var(--bg-card)', zIndex:1, boxShadow:'0 1px 0 rgba(255,255,255,0.1)'}}>
                             <tr>
                                 <th>Fecha</th>
                                 <th>Número</th>
                                 <th>Tipo</th>
+                                <th>Bodega(s)</th>
+                                <th>Vendedor</th>
                                 <th>Estado</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {history.slice(0, 10).map((doc: any) => (
+                            {history.slice(0, 50).map((doc: any) => (
                                 <tr key={doc.id}>
                                     <td>{new Date(doc.date).toLocaleDateString()}</td>
                                     <td style={{fontWeight:600}}>{doc.document_number}</td>
-                                    <td>{doc.doc_type === 'IN' ? 'Entrada' : doc.doc_type === 'OUT' ? 'Salida' : doc.doc_type === 'TR' ? 'Traslado' : 'Ajuste'}</td>
+                                    <td>
+                                        <span className={`badge ${
+                                            doc.doc_type === 'IN' ? 'badge-in' : 
+                                            doc.doc_type === 'OUT' ? 'badge-out' : 
+                                            doc.doc_type === 'TR' ? 'badge-tr' : 'badge-aj'
+                                        }`} style={{padding:'2px 6px', fontSize:'0.75rem'}}>
+                                            {doc.doc_type === 'IN' ? 'Entrada' : doc.doc_type === 'OUT' ? 'Salida' : doc.doc_type === 'TR' ? 'Traslado' : 'Ajuste'}
+                                        </span>
+                                    </td>
+                                    <td style={{fontSize:'0.8rem'}}>
+                                        {doc.doc_type === 'IN' && (
+                                            <span style={{color:'rgba(46, 204, 113, 0.9)'}}>📥 {doc.warehouse_to?.name || 'N/A'}</span>
+                                        )}
+                                        {doc.doc_type === 'OUT' && (
+                                            <span style={{color:'rgba(241, 196, 15, 0.9)'}}>📤 {doc.warehouse_from?.name || 'N/A'}</span>
+                                        )}
+                                        {doc.doc_type === 'TR' && (
+                                            <span style={{color:'rgba(52, 152, 219, 0.9)'}}>
+                                                🔄 {doc.warehouse_from?.name || 'N/A'} ➜ {doc.warehouse_to?.name || 'N/A'}
+                                            </span>
+                                        )}
+                                        {doc.doc_type === 'AJ' && (
+                                            <span style={{color:'rgba(231, 76, 60, 0.9)'}}>⚙️ {doc.warehouse_from?.name || doc.warehouse_to?.name || 'N/A'}</span>
+                                        )}
+                                    </td>
+                                    <td style={{fontSize:'0.8rem', fontWeight:500}}>
+                                        {doc.seller ? doc.seller.name : <span style={{opacity:0.4}}>-</span>}
+                                    </td>
                                     <td>
                                         <span className={`badge ${doc.status === 'APPLIED' ? 'badge-in' : 'badge-out'}`} style={{opacity: doc.status === 'CANCELLED' ? 0.5 : 1}}>
                                             {doc.status === 'APPLIED' ? 'Aplicado' : doc.status === 'CANCELLED' ? 'Anulado' : doc.status}
