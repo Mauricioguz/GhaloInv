@@ -508,7 +508,7 @@ const TransactionEngine = ({ products, warehouses, sellers = [], onRefresh }: an
     const handleEdit = (doc: any) => {
         setDocType(doc.doc_type);
         setFormData({
-            document_number: doc.document_number + " (CORRIGIERDO)",
+            document_number: doc.document_number + " (CORRIGIENDO)",
             warehouse_from_id: doc.warehouse_from_id,
             warehouse_to_id: doc.warehouse_to_id,
             seller_id: doc.seller_id,
