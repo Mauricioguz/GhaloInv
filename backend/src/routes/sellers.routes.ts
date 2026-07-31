@@ -162,8 +162,6 @@ router.get('/commissions/report', async (req, res) => {
 
       const docSales = doc.lines.reduce((sum, line) => sum + (line.total_sale || 0), 0);
       const docCost = doc.lines.reduce((sum, line) => sum + (line.total_cost || 0), 0);
-      const docUtility = docSales - docCost;
-      const docCommission = docUtility > 0 ? docUtility * (seller.commission_pct / 100) : 0;
 
       if (!sellerPeriods[seller.id]) {
         sellerPeriods[seller.id] = [];
@@ -188,11 +186,14 @@ router.get('/commissions/report', async (req, res) => {
       }
       period.sales_total += docSales;
       period.cost_total += docCost;
-      period.commission_earned += docCommission;
     }
 
-    // Sort periods for each seller oldest first to allocate payouts chronologically
+    // Calculate commission_earned based on consolidated net utility per period and sort chronologically
     Object.keys(sellerPeriods).forEach(sId => {
+      sellerPeriods[Number(sId)].forEach(period => {
+        const netUtility = period.sales_total - period.cost_total;
+        period.commission_earned = netUtility > 0 ? netUtility * (period.commission_pct / 100) : 0;
+      });
       sellerPeriods[Number(sId)].sort((a, b) => a.year !== b.year ? a.year - b.year : a.month - b.month);
     });
 
@@ -291,7 +292,7 @@ router.get('/commissions/details', async (req, res) => {
       const sales_total = doc.lines.reduce((sum, line) => sum + (line.total_sale || 0), 0);
       const cost_total = doc.lines.reduce((sum, line) => sum + (line.total_cost || 0), 0);
       const utility = sales_total - cost_total;
-      const commission_earned = utility > 0 ? utility * (seller.commission_pct / 100) : 0;
+      const commission_earned = utility * (seller.commission_pct / 100);
 
       return {
         document_id: doc.id,

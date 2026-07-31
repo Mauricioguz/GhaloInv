@@ -973,15 +973,40 @@ const SalesReport = ({ sellers = [], onProductClick }: any) => {
     // Historical earned commission per seller (All time)
     const historicalEarnedMap = useMemo(() => {
         const map: { [key: number]: number } = {};
+        
+        // Group documents by seller and period (year-month) first
+        const sellerPeriodMap: { [key: string]: { sId: number, sale: number, cost: number, pct: number } } = {};
+        
         data.forEach(doc => {
             if (!doc.seller) return;
             const sId = doc.seller.id;
-            const docSales = doc.lines.reduce((sum, line) => sum + (line.total_sale || 0), 0);
-            const docCost = doc.lines.reduce((sum, line) => sum + (line.total_cost || 0), 0);
-            const docUtility = docSales - docCost;
-            const docCommission = docUtility > 0 ? docUtility * (doc.seller.commission_pct / 100) : 0;
-            map[sId] = (map[sId] || 0) + docCommission;
+            const date = new Date(doc.date);
+            const year = date.getUTCFullYear();
+            const month = date.getUTCMonth() + 1;
+            const key = `${sId}-${year}-${month}`;
+            
+            if (!sellerPeriodMap[key]) {
+                sellerPeriodMap[key] = {
+                    sId,
+                    sale: 0,
+                    cost: 0,
+                    pct: doc.seller.commission_pct || 100
+                };
+            }
+            
+            doc.lines.forEach((line: any) => {
+                sellerPeriodMap[key].sale += line.total_sale || 0;
+                sellerPeriodMap[key].cost += line.total_cost || 0;
+            });
         });
+        
+        // Compute commission per period and aggregate historically
+        Object.values(sellerPeriodMap).forEach(item => {
+            const netUtility = item.sale - item.cost;
+            const commission = netUtility > 0 ? netUtility * (item.pct / 100) : 0;
+            map[item.sId] = (map[item.sId] || 0) + commission;
+        });
+        
         return map;
     }, [data]);
 
