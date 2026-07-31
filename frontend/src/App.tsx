@@ -703,6 +703,7 @@ const TransactionEngine = ({ products, warehouses, sellers = [], onRefresh }: an
                                 <th>Número</th>
                                 <th>Tipo</th>
                                 <th>Bodega(s)</th>
+                                <th>Producto(s)</th>
                                 <th>Vendedor</th>
                                 <th>Estado</th>
                                 <th>Acciones</th>
@@ -737,6 +738,18 @@ const TransactionEngine = ({ products, warehouses, sellers = [], onRefresh }: an
                                         {doc.doc_type === 'AJ' && (
                                             <span style={{color:'rgba(231, 76, 60, 0.9)'}}>⚙️ {doc.warehouse_from?.name || doc.warehouse_to?.name || 'N/A'}</span>
                                         )}
+                                    </td>
+                                    <td style={{fontSize:'0.8rem', minWidth:'200px', maxWidth:'300px'}}>
+                                        {doc.lines?.map((line: any, idx: number) => (
+                                            <div key={line.id || idx} style={{display:'flex', justifyContent:'space-between', gap:'12px', marginBottom: idx < doc.lines.length - 1 ? '4px' : 0}}>
+                                                <span style={{overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap'}} title={line.product?.name}>
+                                                    • {line.product?.name || 'N/A'}
+                                                </span>
+                                                <span style={{fontWeight:600, color:'var(--primary)', whiteSpace:'nowrap', fontSize:'0.75rem'}}>
+                                                    x{line.qty} {line.lot ? `[${line.lot}]` : ''}
+                                                </span>
+                                            </div>
+                                        ))}
                                     </td>
                                     <td style={{fontSize:'0.8rem', fontWeight:500}}>
                                         {doc.seller ? doc.seller.name : <span style={{opacity:0.4}}>-</span>}
