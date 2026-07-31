@@ -148,7 +148,9 @@ router.get('/commissions/report', async (req, res) => {
     });
 
     const payouts = await prisma.commissionPayout.findMany();
-    const reportMap: { [key: string]: any } = {};
+    
+    // Group monthly sales data by seller
+    const sellerPeriods: { [key: number]: any[] } = {};
 
     for (const doc of documents) {
       const seller = sellers.find(s => s.id === doc.seller_id);
@@ -157,15 +159,19 @@ router.get('/commissions/report', async (req, res) => {
       const date = new Date(doc.date);
       const year = date.getUTCFullYear();
       const month = date.getUTCMonth() + 1;
-      const key = `${seller.id}-${year}-${month}`;
 
       const docSales = doc.lines.reduce((sum, line) => sum + (line.total_sale || 0), 0);
       const docCost = doc.lines.reduce((sum, line) => sum + (line.total_cost || 0), 0);
       const docUtility = docSales - docCost;
       const docCommission = docUtility > 0 ? docUtility * (seller.commission_pct / 100) : 0;
 
-      if (!reportMap[key]) {
-        reportMap[key] = {
+      if (!sellerPeriods[seller.id]) {
+        sellerPeriods[seller.id] = [];
+      }
+
+      let period = sellerPeriods[seller.id].find(p => p.year === year && p.month === month);
+      if (!period) {
+        period = {
           seller_id: seller.id,
           seller_name: seller.name,
           seller_code: seller.code,
@@ -178,48 +184,78 @@ router.get('/commissions/report', async (req, res) => {
           payouts_total: 0,
           balance: 0
         };
+        sellerPeriods[seller.id].push(period);
       }
-      reportMap[key].sales_total += docSales;
-      reportMap[key].cost_total += docCost;
-      reportMap[key].commission_earned += docCommission;
+      period.sales_total += docSales;
+      period.cost_total += docCost;
+      period.commission_earned += docCommission;
     }
 
-    for (const pay of payouts) {
-      const seller = sellers.find(s => s.id === pay.seller_id);
-      if (!seller) continue;
-
-      const key = `${seller.id}-${pay.year}-${pay.month}`;
-
-      if (!reportMap[key]) {
-        reportMap[key] = {
-          seller_id: seller.id,
-          seller_name: seller.name,
-          seller_code: seller.code,
-          commission_pct: seller.commission_pct,
-          year: pay.year,
-          month: pay.month,
-          sales_total: 0,
-          cost_total: 0,
-          commission_earned: 0,
-          payouts_total: 0,
-          balance: 0
-        };
-      }
-      reportMap[key].payouts_total += pay.amount;
-    }
-
-    const result = Object.values(reportMap).map(item => {
-      item.balance = item.commission_earned - item.payouts_total;
-      return item;
+    // Sort periods for each seller oldest first to allocate payouts chronologically
+    Object.keys(sellerPeriods).forEach(sId => {
+      sellerPeriods[Number(sId)].sort((a, b) => a.year !== b.year ? a.year - b.year : a.month - b.month);
     });
 
-    result.sort((a, b) => {
+    const resultList: any[] = [];
+
+    for (const seller of sellers) {
+      const sId = seller.id;
+      const sPeriods = sellerPeriods[sId] || [];
+      const sPayouts = payouts.filter(p => p.seller_id === sId);
+      const totalPaid = sPayouts.reduce((sum, p) => sum + p.amount, 0);
+
+      // Scenario A: payouts exist but no documents registered for the seller
+      if (sPeriods.length === 0 && sPayouts.length > 0) {
+        const payMap: { [key: string]: any } = {};
+        for (const pay of sPayouts) {
+          const key = `${pay.year}-${pay.month}`;
+          if (!payMap[key]) {
+            payMap[key] = {
+              seller_id: seller.id,
+              seller_name: seller.name,
+              seller_code: seller.code,
+              commission_pct: seller.commission_pct,
+              year: pay.year,
+              month: pay.month,
+              sales_total: 0,
+              cost_total: 0,
+              commission_earned: 0,
+              payouts_total: 0,
+              balance: 0
+            };
+          }
+          payMap[key].payouts_total += pay.amount;
+          payMap[key].balance -= pay.amount;
+        }
+        resultList.push(...Object.values(payMap));
+        continue;
+      }
+
+      // Scenario B: both exist, allocate chronologically
+      let remainingPaid = totalPaid;
+      for (let i = 0; i < sPeriods.length; i++) {
+        const period = sPeriods[i];
+        const isLast = i === sPeriods.length - 1;
+        if (isLast) {
+          period.payouts_total = remainingPaid;
+          period.balance = period.commission_earned - remainingPaid;
+        } else {
+          const toAllocate = Math.min(remainingPaid, period.commission_earned);
+          period.payouts_total = toAllocate;
+          period.balance = period.commission_earned - toAllocate;
+          remainingPaid -= toAllocate;
+        }
+      }
+      resultList.push(...sPeriods);
+    }
+
+    resultList.sort((a, b) => {
       if (b.year !== a.year) return b.year - a.year;
       if (b.month !== a.month) return b.month - a.month;
       return a.seller_name.localeCompare(b.seller_name);
     });
 
-    res.json(result);
+    res.json(resultList);
   } catch (error: any) {
     console.error('Error generating commission report:', error);
     res.status(500).json({ error: error.message || 'Error generating report' });
