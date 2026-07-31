@@ -89,6 +89,20 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+// Get all payouts
+router.get('/payouts/all', async (req, res) => {
+  try {
+    const payouts = await prisma.commissionPayout.findMany({
+      include: { seller: true },
+      orderBy: { date: 'desc' }
+    });
+    res.json(payouts);
+  } catch (error: any) {
+    console.error('Error fetching all payouts:', error);
+    res.status(500).json({ error: error.message || 'Error fetching payouts' });
+  }
+});
+
 // Create a payout for a seller
 router.post('/:id/payouts', async (req, res) => {
   try {

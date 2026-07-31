@@ -827,8 +827,17 @@ const ProductDetailModal = ({ productId, onClose }: any) => {
 const SalesReport = ({ sellers = [], onProductClick }: any) => {
     const [data, setData] = useState<any[]>([]);
     const [commissionReport, setCommissionReport] = useState<any[]>([]);
+    const [payoutsData, setPayoutsData] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('');
+    
+    // Date Range Filters
+    const [startDate, setStartDate] = useState(() => {
+        const d = new Date();
+        d.setDate(d.getDate() - 30); // Default to last 30 days
+        return d.toISOString().split('T')[0];
+    });
+    const [endDate, setEndDate] = useState(() => new Date().toISOString().split('T')[0]);
 
     const fetchReport = async () => {
         setLoading(true);
@@ -838,15 +847,59 @@ const SalesReport = ({ sellers = [], onProductClick }: any) => {
             
             const resComm = await fetch(`${API_URL}/sellers/commissions/report`);
             if (resComm.ok) setCommissionReport(await resComm.json());
+
+            const resPay = await fetch(`${API_URL}/sellers/payouts/all`);
+            if (resPay.ok) setPayoutsData(await resPay.json());
         } catch (e) { console.error(e); }
         setLoading(false);
     };
 
     useEffect(() => { fetchReport(); }, []);
 
+    // Filter documents by date range
+    const filteredData = useMemo(() => {
+        return data.filter(doc => {
+            const docDate = doc.date.split('T')[0];
+            return docDate >= startDate && docDate <= endDate;
+        });
+    }, [data, startDate, endDate]);
+
+    // Filter payouts by date range
+    const filteredPayouts = useMemo(() => {
+        return payoutsData.filter(p => {
+            const pDate = p.date.split('T')[0];
+            return pDate >= startDate && pDate <= endDate;
+        });
+    }, [payoutsData, startDate, endDate]);
+
+    // Historical earned commission per seller (All time)
+    const historicalEarnedMap = useMemo(() => {
+        const map: { [key: number]: number } = {};
+        data.forEach(doc => {
+            if (!doc.seller) return;
+            const sId = doc.seller.id;
+            const docSales = doc.lines.reduce((sum, line) => sum + (line.total_sale || 0), 0);
+            const docCost = doc.lines.reduce((sum, line) => sum + (line.total_cost || 0), 0);
+            const docUtility = docSales - docCost;
+            const docCommission = docUtility > 0 ? docUtility * ((doc.seller.commission_pct || 100) / 100) : 0;
+            map[sId] = (map[sId] || 0) + docCommission;
+        });
+        return map;
+    }, [data]);
+
+    // Historical paid payouts per seller (All time)
+    const historicalPaidMap = useMemo(() => {
+        const map: { [key: number]: number } = {};
+        payoutsData.forEach(p => {
+            const sId = p.seller_id;
+            map[sId] = (map[sId] || 0) + (p.amount || 0);
+        });
+        return map;
+    }, [payoutsData]);
+
     const flattenedLines = useMemo(() => {
         const lines: any[] = [];
-        data.forEach(doc => {
+        filteredData.forEach(doc => {
             doc.lines.forEach((line: any) => {
                 lines.push({
                     id: line.id,
@@ -869,7 +922,7 @@ const SalesReport = ({ sellers = [], onProductClick }: any) => {
             l.product_sku?.toLowerCase().includes(filter.toLowerCase()) ||
             l.doc_number?.toLowerCase().includes(filter.toLowerCase())
         );
-    }, [data, filter]);
+    }, [filteredData, filter]);
 
     const totals = useMemo(() => {
         return flattenedLines.reduce((acc, curr) => ({
@@ -882,7 +935,7 @@ const SalesReport = ({ sellers = [], onProductClick }: any) => {
     const sellerStats = useMemo(() => {
         const statsMap: { [key: string]: { id: number, name: string, code: string, warehouse: string, sale: number, cost: number } } = {};
 
-        data.forEach(doc => {
+        filteredData.forEach(doc => {
             if (doc.seller) {
                 const sId = doc.seller.id;
                 if (!statsMap[sId]) {
@@ -918,39 +971,70 @@ const SalesReport = ({ sellers = [], onProductClick }: any) => {
             }
         });
 
-        // Map commissions from report
-        const commissionsMap: { [key: number]: { paid: number, balance: number } } = {};
-        commissionReport.forEach(item => {
-            const sId = item.seller_id;
-            if (!commissionsMap[sId]) {
-                commissionsMap[sId] = { paid: 0, balance: 0 };
-            }
-            commissionsMap[sId].paid += item.payouts_total || 0;
-            commissionsMap[sId].balance += item.balance || 0;
+        // Map payouts in the selected date range
+        const periodPayoutsMap: { [key: number]: number } = {};
+        filteredPayouts.forEach(p => {
+            const sId = p.seller_id;
+            periodPayoutsMap[sId] = (periodPayoutsMap[sId] || 0) + (p.amount || 0);
         });
 
         return Object.values(statsMap)
             .map(s => {
-                const comm = commissionsMap[s.id] || { paid: 0, balance: 0 };
-                // Subtract PAID commission from utility as requested
-                const utility = s.sale - s.cost - comm.paid;
+                const periodPaid = periodPayoutsMap[s.id] || 0;
+                // Subtract period payouts from utility
+                const utility = s.sale - s.cost - periodPaid;
                 const margin = s.sale > 0 ? (utility / s.sale) * 100 : 0;
+                
+                // Calculate historical outstanding balance
+                const earned = historicalEarnedMap[s.id] || 0;
+                const paid = historicalPaidMap[s.id] || 0;
+                const balance = earned - paid;
+
                 return { 
                     ...s, 
-                    payouts: comm.paid, 
-                    balance: comm.balance, 
+                    payouts: periodPaid, 
+                    balance: balance, 
                     utility, 
                     margin 
                 };
             })
             .sort((a, b) => b.utility - a.utility);
-    }, [data, commissionReport]);
+    }, [filteredData, filteredPayouts, historicalEarnedMap, historicalPaidMap]);
 
     return (
         <div className="view">
             <div className="header">
                 <h1>Reporte Detallado de Salidas</h1>
                 <button className="btn btn-outline" onClick={fetchReport}>🔄 Actualizar</button>
+            </div>
+
+            {/* Filtro por Rango de Fechas */}
+            <div className="glass-card" style={{ marginBottom: '1.5rem', display: 'flex', gap: '1.5rem', alignItems: 'center', flexWrap: 'wrap', padding: '1rem' }}>
+                <h4 style={{ margin: 0, color: 'var(--primary)', fontSize: '0.9rem' }}>📅 Filtrar por Rango de Fechas (Ranking y Detalles):</h4>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <span style={{ fontSize: '0.8rem', opacity: 0.8 }}>Desde:</span>
+                    <input 
+                        type="date" 
+                        value={startDate} 
+                        onChange={e => setStartDate(e.target.value)} 
+                        style={{ width: 'auto', marginBottom: 0, padding: '6px 10px' }}
+                    />
+                </div>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <span style={{ fontSize: '0.8rem', opacity: 0.8 }}>Hasta:</span>
+                    <input 
+                        type="date" 
+                        value={endDate} 
+                        onChange={e => setEndDate(e.target.value)} 
+                        style={{ width: 'auto', marginBottom: 0, padding: '6px 10px' }}
+                    />
+                </div>
+                <button className="btn btn-outline" style={{ padding: '6px 12px', fontSize: '0.75rem' }} onClick={() => {
+                    const d = new Date();
+                    d.setDate(d.getDate() - 30);
+                    setStartDate(d.toISOString().split('T')[0]);
+                    setEndDate(new Date().toISOString().split('T')[0]);
+                }}>Reestablecer</button>
             </div>
 
             {/* Ranking de Vendedores Table */}
