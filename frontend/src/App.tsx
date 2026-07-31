@@ -603,7 +603,7 @@ const TransactionEngine = ({ products, warehouses, sellers = [], onRefresh }: an
                         const selectedProd = products.find((p: any) => Number(p.id) === Number(ln.product_id));
                         const stats = selectedProd ? getProductStats(selectedProd, ln.lot) : { qty: 0, cost: 0, lot: '' };
                         const productBalances = selectedProd ? (selectedProd.balances || []).filter(
-                            (b: any) => Number(b.warehouse_id) === Number(formData.warehouse_from_id) && b.qty_on_hand > 0
+                            (b: any) => Number(b.warehouse_id) === Number(formData.warehouse_from_id) && (b.qty_on_hand > 0 || (ln.lot && b.lot === ln.lot))
                         ) : [];
 
                         return (
@@ -649,6 +649,9 @@ const TransactionEngine = ({ products, warehouses, sellers = [], onRefresh }: an
                                                     {b.lot} ({b.qty_on_hand} ud)
                                                 </option>
                                             ))}
+                                            {ln.lot && !productBalances.some((b: any) => b.lot === ln.lot) && (
+                                                <option value={ln.lot}>{ln.lot} (0 ud)</option>
+                                            )}
                                         </select>
                                     )}
                                     {docType!=='IN' && <small style={{position:'absolute', bottom:'-18px', left:0, fontSize:'9px', color:'var(--primary)'}}>Selección Manual</small>}
