@@ -38,6 +38,26 @@ router.post('/upload', upload.single('file'), (req, res) => {
 // List all documents
 router.get('/', async (req, res) => {
   try {
+    // Auto-fix spelling typos in existing database records
+    const typoDocs = await prisma.inventoryDocument.findMany({
+      where: {
+        document_number: {
+          contains: '(CORRIGIERDO)'
+        }
+      }
+    });
+    for (const doc of typoDocs) {
+      const fixedNum = doc.document_number.replace(/\(CORRIGIERDO\)/g, '(CORRIGIENDO)');
+      try {
+        await prisma.inventoryDocument.update({
+          where: { id: doc.id },
+          data: { document_number: fixedNum }
+        });
+      } catch (err) {
+        console.error(`Failed to auto-fix doc number for doc id ${doc.id}:`, err);
+      }
+    }
+
     const documents = await prisma.inventoryDocument.findMany({
       include: {
         seller: true,
