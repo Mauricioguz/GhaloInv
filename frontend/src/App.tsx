@@ -826,6 +826,7 @@ const ProductDetailModal = ({ productId, onClose }: any) => {
 
 const SalesReport = ({ sellers = [], onProductClick }: any) => {
     const [data, setData] = useState<any[]>([]);
+    const [commissionReport, setCommissionReport] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('');
 
@@ -834,6 +835,9 @@ const SalesReport = ({ sellers = [], onProductClick }: any) => {
         try {
             const res = await fetch(`${API_URL}/documents/report/outputs`);
             if (res.ok) setData(await res.json());
+            
+            const resComm = await fetch(`${API_URL}/sellers/commissions/report`);
+            if (resComm.ok) setCommissionReport(await resComm.json());
         } catch (e) { console.error(e); }
         setLoading(false);
     };
@@ -914,14 +918,33 @@ const SalesReport = ({ sellers = [], onProductClick }: any) => {
             }
         });
 
+        // Map commissions from report
+        const commissionsMap: { [key: number]: { paid: number, balance: number } } = {};
+        commissionReport.forEach(item => {
+            const sId = item.seller_id;
+            if (!commissionsMap[sId]) {
+                commissionsMap[sId] = { paid: 0, balance: 0 };
+            }
+            commissionsMap[sId].paid += item.payouts_total || 0;
+            commissionsMap[sId].balance += item.balance || 0;
+        });
+
         return Object.values(statsMap)
             .map(s => {
-                const utility = s.sale - s.cost;
+                const comm = commissionsMap[s.id] || { paid: 0, balance: 0 };
+                // Subtract PAID commission from utility as requested
+                const utility = s.sale - s.cost - comm.paid;
                 const margin = s.sale > 0 ? (utility / s.sale) * 100 : 0;
-                return { ...s, utility, margin };
+                return { 
+                    ...s, 
+                    payouts: comm.paid, 
+                    balance: comm.balance, 
+                    utility, 
+                    margin 
+                };
             })
             .sort((a, b) => b.utility - a.utility);
-    }, [data]);
+    }, [data, commissionReport]);
 
     return (
         <div className="view">
@@ -942,7 +965,9 @@ const SalesReport = ({ sellers = [], onProductClick }: any) => {
                                 <th>Bodega</th>
                                 <th style={{ textAlign: 'right' }}>Vendido (Precio)</th>
                                 <th style={{ textAlign: 'right' }}>Costo Inventario</th>
-                                <th style={{ textAlign: 'right' }}>Diferencia (Utilidad)</th>
+                                <th style={{ textAlign: 'right', color: 'var(--success)' }}>Comisión Pagada</th>
+                                <th style={{ textAlign: 'right', color: 'var(--warning)' }}>Saldo Pendiente</th>
+                                <th style={{ textAlign: 'right' }}>Diferencia (Utilidad Neta)</th>
                                 <th style={{ textAlign: 'center', width: '100px' }}>Margen</th>
                             </tr>
                         </thead>
@@ -964,6 +989,12 @@ const SalesReport = ({ sellers = [], onProductClick }: any) => {
                                         <td style={{ textAlign: 'right', opacity: 0.85 }}>
                                             {new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(stat.cost)}
                                         </td>
+                                        <td style={{ textAlign: 'right', color: 'var(--success)', fontWeight: 600 }}>
+                                            {new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(stat.payouts || 0)}
+                                        </td>
+                                        <td style={{ textAlign: 'right', fontWeight: 600, color: (stat.balance || 0) > 0 ? 'var(--warning)' : 'inherit' }}>
+                                            {new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(stat.balance || 0)}
+                                        </td>
                                         <td style={{ textAlign: 'right', fontWeight: 700, color: stat.utility >= 0 ? 'var(--success)' : 'var(--danger)' }}>
                                             {new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(stat.utility)}
                                         </td>
@@ -977,7 +1008,7 @@ const SalesReport = ({ sellers = [], onProductClick }: any) => {
                             })}
                             {sellerStats.length === 0 && (
                                 <tr>
-                                    <td colSpan={7} style={{ textAlign: 'center', padding: '1.5rem', opacity: 0.5 }}>No hay datos de ventas para mostrar ranking.</td>
+                                    <td colSpan={9} style={{ textAlign: 'center', padding: '1.5rem', opacity: 0.5 }}>No hay datos de ventas para mostrar ranking.</td>
                                 </tr>
                             )}
                         </tbody>
