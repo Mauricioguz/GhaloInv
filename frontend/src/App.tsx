@@ -881,7 +881,7 @@ const SalesReport = ({ sellers = [], onProductClick }: any) => {
             const docSales = doc.lines.reduce((sum, line) => sum + (line.total_sale || 0), 0);
             const docCost = doc.lines.reduce((sum, line) => sum + (line.total_cost || 0), 0);
             const docUtility = docSales - docCost;
-            const docCommission = docUtility > 0 ? docUtility * ((doc.seller.commission_pct || 100) / 100) : 0;
+            const docCommission = docUtility > 0 ? docUtility * (doc.seller.commission_pct / 100) : 0;
             map[sId] = (map[sId] || 0) + docCommission;
         });
         return map;

@@ -129,6 +129,12 @@ router.post('/:id/payouts', async (req, res) => {
 // Get commissions and payouts report grouped by seller, year, and month
 router.get('/commissions/report', async (req, res) => {
   try {
+    // Auto-migrate sellers with 0% commission to 100% to guarantee correct calculation
+    await prisma.seller.updateMany({
+      where: { commission_pct: 0 },
+      data: { commission_pct: 100 }
+    });
+
     const sellers = await prisma.seller.findMany();
     const documents = await prisma.inventoryDocument.findMany({
       where: {
@@ -149,8 +155,8 @@ router.get('/commissions/report', async (req, res) => {
       if (!seller) continue;
 
       const date = new Date(doc.date);
-      const year = date.getFullYear();
-      const month = date.getMonth() + 1;
+      const year = date.getUTCFullYear();
+      const month = date.getUTCMonth() + 1;
       const key = `${seller.id}-${year}-${month}`;
 
       const docSales = doc.lines.reduce((sum, line) => sum + (line.total_sale || 0), 0);
@@ -223,6 +229,12 @@ router.get('/commissions/report', async (req, res) => {
 // Get detailed commission list sorted by date/document
 router.get('/commissions/details', async (req, res) => {
   try {
+    // Auto-migrate sellers with 0% commission to 100% to guarantee correct calculation
+    await prisma.seller.updateMany({
+      where: { commission_pct: 0 },
+      data: { commission_pct: 100 }
+    });
+
     const documents = await prisma.inventoryDocument.findMany({
       where: {
         doc_type: 'OUT',
