@@ -551,15 +551,17 @@ const TransactionEngine = ({ products, warehouses, sellers = [], onRefresh }: an
     const activeWFrom = useMemo(() => {
         return docType === 'IN' 
             ? warehouses.filter((w:any) => w.active)
-            : warehouses.filter((w:any) => w.active && w.balances?.some((b:any) => b.qty_on_hand > 0));
-    }, [docType, warehouses]);
+            : warehouses.filter((w:any) => w.active && (w.balances?.some((b:any) => b.qty_on_hand > 0) || Number(w.id) === Number(formData.warehouse_from_id)));
+    }, [docType, formData.warehouse_from_id, warehouses]);
 
     const availableProds = useMemo(() => {
         if (docType === 'IN' || !formData.warehouse_from_id) return products;
-        return products.filter((p: any) => 
-            p.balances?.some((b:any) => Number(b.warehouse_id) === Number(formData.warehouse_from_id) && b.qty_on_hand > 0)
-        );
-    }, [docType, formData.warehouse_from_id, products]);
+        return products.filter((p: any) => {
+            const hasStock = p.balances?.some((b:any) => Number(b.warehouse_id) === Number(formData.warehouse_from_id) && b.qty_on_hand > 0);
+            const isOriginalProduct = formData.lines.some((l: any) => Number(l.product_id) === Number(p.id));
+            return hasStock || isOriginalProduct;
+        });
+    }, [docType, formData.warehouse_from_id, formData.lines, products]);
 
     const fromWarehouseName = warehouses.find(w => Number(w.id) === Number(formData.warehouse_from_id))?.name || 'Origen';
 
