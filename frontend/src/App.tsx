@@ -1160,11 +1160,25 @@ const SellerManager = ({ sellers, warehouses, onRefresh }: any) => {
         <div className="view">
             <div className="header">
                 <h1>Vendedores</h1>
-                <button className="btn btn-primary" onClick={() => { 
-                    setShowAdd(true); 
-                    setEditingId(null); 
-                    setFormData({name:'', code:'', warehouse_id:'', commission_pct: '0'}); 
-                }}>+ Nuevo Vendedor</button>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                    <button className="btn btn-outline" onClick={() => {
+                        setPayForm({
+                            seller_id: 0,
+                            seller_name: '',
+                            amount: 0,
+                            notes: '',
+                            month: new Date().getMonth() + 1,
+                            year: new Date().getFullYear(),
+                            date: new Date().toISOString().split('T')[0]
+                        });
+                        setShowPayModal(true);
+                    }}>💵 Registrar Pago de Comisión</button>
+                    <button className="btn btn-primary" onClick={() => { 
+                        setShowAdd(true); 
+                        setEditingId(null); 
+                        setFormData({name:'', code:'', warehouse_id:'', commission_pct: '0'}); 
+                    }}>+ Nuevo Vendedor</button>
+                </div>
             </div>
             {showAdd && (
                 <div className="glass-card" style={{marginBottom:'2rem'}}>
@@ -1381,12 +1395,54 @@ const SellerManager = ({ sellers, warehouses, onRefresh }: any) => {
                         <form onSubmit={handlePaySubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
                             <div>
                                 <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Vendedor:</label>
-                                <div style={{ fontSize: '1.15rem', fontWeight: 600, color: 'var(--primary)' }}>{payForm.seller_name}</div>
+                                {payForm.seller_id === 0 ? (
+                                    <select 
+                                        value={payForm.seller_id || ''} 
+                                        onChange={e => {
+                                            const sid = parseInt(e.target.value);
+                                            const sel = sellers.find((s: any) => s.id === sid);
+                                            setPayForm({ ...payForm, seller_id: sid, seller_name: sel ? sel.name : '' });
+                                        }} 
+                                        required
+                                        style={{ width: '100%', marginBottom: 0 }}
+                                    >
+                                        <option value="">Seleccione Vendedor...</option>
+                                        {sellers.filter((s: any) => s.active).map((s: any) => (
+                                            <option key={s.id} value={s.id}>{s.name} [{s.code}]</option>
+                                        ))}
+                                    </select>
+                                ) : (
+                                    <div style={{ fontSize: '1.15rem', fontWeight: 600, color: 'var(--primary)' }}>{payForm.seller_name}</div>
+                                )}
                             </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '1rem' }}>
                                 <div>
                                     <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Periodo Correspondiente:</label>
-                                    <div style={{ fontWeight: 600 }}>{payForm.month}/{payForm.year}</div>
+                                    {payForm.seller_id === 0 ? (
+                                        <div style={{ display: 'flex', gap: '5px' }}>
+                                            <select 
+                                                value={payForm.month || ''} 
+                                                onChange={e => setPayForm({ ...payForm, month: parseInt(e.target.value) })} 
+                                                required
+                                                style={{ flex: 1.2, marginBottom: 0 }}
+                                            >
+                                                <option value="">Mes...</option>
+                                                {Array.from({ length: 12 }, (_, i) => (
+                                                    <option key={i + 1} value={i + 1}>{i + 1}</option>
+                                                ))}
+                                            </select>
+                                            <input 
+                                                type="number" 
+                                                value={payForm.year || new Date().getFullYear()} 
+                                                onChange={e => setPayForm({ ...payForm, year: parseInt(e.target.value) || new Date().getFullYear() })} 
+                                                required
+                                                placeholder="Año"
+                                                style={{ flex: 1, marginBottom: 0 }}
+                                            />
+                                        </div>
+                                    ) : (
+                                        <div style={{ fontWeight: 600 }}>{payForm.month}/{payForm.year}</div>
+                                    )}
                                 </div>
                                 <div>
                                     <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Fecha de Registro:</label>
@@ -1395,7 +1451,7 @@ const SellerManager = ({ sellers, warehouses, onRefresh }: any) => {
                                         value={payForm.date} 
                                         onChange={e => setPayForm({ ...payForm, date: e.target.value })} 
                                         required 
-                                        style={{ width: '100%', padding: '6px' }}
+                                        style={{ width: '100%', padding: '6px', marginBottom: 0 }}
                                     />
                                 </div>
                             </div>
@@ -1404,14 +1460,15 @@ const SellerManager = ({ sellers, warehouses, onRefresh }: any) => {
                                 <input 
                                     type="number" 
                                     step="any" 
-                                    value={payForm.amount} 
+                                    value={payForm.amount || ''} 
                                     onChange={e => setPayForm({ ...payForm, amount: parseFloat(e.target.value) || 0 })} 
                                     required 
                                     min="1"
-                                    max={payForm.amount} // Cannot pay more than balance
                                     style={{ width: '100%', padding: '10px' }}
                                 />
-                                <small style={{ color: 'var(--text-muted)' }}>Monto sugerido/pendiente: {new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(payForm.amount)}</small>
+                                {payForm.seller_id !== 0 && (
+                                    <small style={{ color: 'var(--text-muted)' }}>Monto sugerido/pendiente: {new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(payForm.amount)}</small>
+                                )}
                             </div>
                             <div>
                                 <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px' }}>Notas / Observación:</label>
